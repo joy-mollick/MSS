@@ -16,7 +16,7 @@ function App() {
   return (
     <>
     
-    <Router>
+    <Router basename="/CineCertifiedWebsite">
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='*' element={<HomePage />} />
