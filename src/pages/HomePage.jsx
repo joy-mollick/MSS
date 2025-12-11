@@ -14,6 +14,7 @@ export const HomePage = () => {
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 right-0 w-[1000px] h-[450px] bg-[#E5970C]/20 blur-[100px] rounded-full" />
       </div>
+      {/* hi */}
       
       <Navbar selectedMenu="Home"/>
       <HeroSection />
