@@ -10,7 +10,7 @@ const HeroSection = () => {
   return (
     <>
       {/* Hero Section */}
-      <section className="mt-8 md:mt-16 relative z-10 container mx-auto px-6 py-16 text-center">
+      <section className="mt-8 md:mt-16 relative z-10 container mx-auto px-6 pt-16 text-center">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-8">
           <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold leading-tight uppercase">
             <span className="text-[#FAB614]">For Camera Crew, </span>
@@ -28,7 +28,7 @@ const HeroSection = () => {
       </section>
 
       {/* About Section */}
-      <section className="relative z-10 container mx-auto px-6 py-16">
+      <section id="about" className="relative z-10 container mx-auto px-6 pt-24 py-16">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-12">
           <div className="relative flex-shrink-0 w-full lg:w-auto">
             <img

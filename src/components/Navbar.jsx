@@ -1,16 +1,55 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react"; // Import icons
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = ({ selectedMenu = 'Home' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = ['Home', 'About', 'Professional Development', 'Ancillary Learning', 'Patrons', 'News', 'FAQ'];
 
-  // Toggle function
-  const toggleMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  // Map menu items to their routes and section IDs
+  const sectionMap = {
+    'Home': { path: '/', section: null },
+    'About': { path: '/', section: 'about' },
+    'Professional Development': { path: '/', section: 'professional-development' },
+    'Ancillary Learning': { path: '/ancillary-learning', section: null },
+    'Patrons': { path: '/patrons', section: null },
+    'News': { path: '/news', section: null },
+    'FAQ': { path: '/faq', section: null }
+  };
+
+  // Handle navigation with section scrolling
+  const handleNavigation = (item) => {
+    const { path, section } = sectionMap[item];
+    
+    if (section) {
+      // If we're already on the home page, just scroll to the section
+      if (window.location.pathname === '/' || window.location.pathname === '/CineCertifiedWebsite/') {
+        const element = document.getElementById(section);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // Navigate to home and then scroll to section
+        navigate(path);
+        setTimeout(() => {
+          const element = document.getElementById(section);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
+    } else {
+      navigate(path);
+    }
+  };
+
+  // Handle logo click - go to home and scroll to top
+  const handleLogoClick = () => {
+    navigate('/');
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -19,20 +58,20 @@ const Navbar = ({ selectedMenu = 'Home' }) => {
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           
           {/* 1. Logo */}
-          <Link to="/" className="flex-shrink-0 z-50">
+          <button onClick={handleLogoClick} className="flex-shrink-0 z-50 bg-none border-none cursor-pointer">
             <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/ede79040027d7dc059545c7584737b9c2edd8cd7?width=488"
+              src="./logo.png"
               alt="CineCertified Logo"
               className="h-10 md:h-12 w-auto object-contain"
             />
-          </Link>
+          </button>
           
           {/* 2. Desktop Navigation (Hidden on Mobile) */}
           <nav className="hidden xl:flex items-center gap-1 bg-white/5 rounded-full px-2 py-1 border border-white/5">
             {navItems.map((item) => (
-              <Link
+              <button
                 key={item}
-                to={`/${item.toLowerCase().replace(/\s+/g, '-')}`}
+                onClick={() => handleNavigation(item)}
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
                   item === selectedMenu
                     ? 'bg-[#FAB614] text-black shadow-[0_0_15px_rgba(250,182,20,0.4)]'
@@ -40,7 +79,7 @@ const Navbar = ({ selectedMenu = 'Home' }) => {
                 }`}
               >
                 {item}
-              </Link>
+              </button>
             ))}
           </nav>
 
@@ -78,24 +117,26 @@ const Navbar = ({ selectedMenu = 'Home' }) => {
       >
         <div className="flex flex-col px-6 gap-4">
           {navItems.map((item) => (
-            <Link
+            <button
               key={item}
-              to={`/${item.toLowerCase().replace(/\s+/g, '-')}`}
-              onClick={() => setIsMobileMenuOpen(false)} // Close menu on click
-              className={`text-lg font-medium py-2 border-b border-white/5 ${
+              onClick={() => {
+                handleNavigation(item);
+                setIsMobileMenuOpen(false);
+              }}
+              className={`text-lg font-medium py-2 border-b border-white/5 text-left ${
                 item === selectedMenu ? 'text-[#FAB614]' : 'text-gray-300'
               }`}
             >
               {item}
-            </Link>
+            </button>
           ))}
           
           {/* Mobile CTA Button (Since desktop button is hidden) */}
-          <div className="pt-4">
-            <button className="bg-linear-to-r from-[#FAB614] to-[#E5970C] text-black font-bold text-md h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3 cursor-pointer hover:shadow-[0_0_30px_rgba(229,151,12,0.5)] transition-shadow">
+          <Link to="/trainees" className='mt-4 w-full'>
+            <button className="cursor-pointer w-full xl:hidden bg-gradient-to-r from-[#FAB614] to-[#E5970C] text-black font-bold text-md h-14 px-8 rounded-full hover:brightness-110 transition-all shadow-[0_0_20px_rgba(229,151,12,0.3)]">
               Trainee Database
-                        </button>
-          </div>
+            </button>
+          </Link>
         </div>
       </div>
     </header>

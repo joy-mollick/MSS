@@ -3,6 +3,7 @@ import './App.css'
 import React from 'react'
 import { HomePage } from './pages/HomePage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import AncillaryLearningPage from './pages/AncillaryLearningPage';
 import PatronsPage from './pages/PatronsPage';
 import NewsPage from './pages/NewsPage';
@@ -17,6 +18,7 @@ function App() {
     <>
     
     <Router basename="/CineCertifiedWebsite">
+      <ScrollToTop />
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='*' element={<HomePage />} />
