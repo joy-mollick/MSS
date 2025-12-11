@@ -6,10 +6,56 @@ import blackLogo from '@/assets/black-logo.png';
 import appstore from '@/assets/appstore.png';
 import playstore from '@/assets/playstore.png';
 import { Mail, Instagram, Linkedin, Facebook, Twitter } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+    const navigate = useNavigate();
+
+    // Map footer nav items to their routes and section IDs
+    const footerNavMap = {
+        'Home': { path: '/', section: null },
+        'About': { path: '/', section: 'about' },
+        'Ambassador': { path: '/', section: null },
+        'Learning': { path: '/ancillary-learning', section: null },
+        'Patrons': { path: '/patrons', section: null },
+        'FAQ': { path: '/faq', section: null }
+    };
+
+    // Handle navigation with section scrolling
+    const handleNavigation = (item) => {
+        const config = footerNavMap[item];
+        if (!config) return;
+
+        const { path, section } = config;
+        
+        if (section) {
+            // If we're already on the home page, just scroll to the section
+            if (window.location.pathname === '/' || window.location.pathname === '/CineCertifiedWebsite/') {
+                const element = document.getElementById(section);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                // Navigate to home and then scroll to section
+                navigate(path);
+                setTimeout(() => {
+                    const element = document.getElementById(section);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
+            }
+        } else if (item === 'Home') {
+            // Home scrolls to top
+            navigate(path);
+            window.scrollTo(0, 0);
+        } else {
+            navigate(path);
+        }
+    };
+
     return (
-        <footer className="relative mt-20 text-black overflow-hidden" style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <footer className="pb-8 relative mt-20 text-black overflow-hidden" style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="container mx-auto px-6 py-12">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                     <div className="flex flex-col gap-4">
@@ -19,10 +65,10 @@ const Footer = () => {
                         </p>
                         <div className="flex gap-4">
                             <div className="w-40 flex items-center justify-center">
-                                <a href="#" target="_blank" rel="noopener noreferrer"><img src={appstore} alt="Apple App Store" /></a>
+                                <a href="https://apps.apple.com/gb/app/cinecertified/id6754809670" target="_blank" rel="noopener noreferrer"><img src={appstore} alt="Apple App Store" /></a>
                             </div>
                             <div className="w-40 flex items-center justify-center">
-                                <a href="#" target="_blank" rel="noopener noreferrer"><img src={playstore} alt="Google Play Store" /></a>
+                                <a href="https://play.google.com/store/apps/details?id=com.cine_certified" target="_blank" rel="noopener noreferrer"><img src={playstore} alt="Google Play Store" /></a>
                             </div>
                         </div>
                     </div>
@@ -31,9 +77,13 @@ const Footer = () => {
                         <h3 className="text-2xl font-semibold">CineCertified</h3>
                         <nav className="flex flex-col gap-2">
                             {['Home', 'About', 'Ambassador', 'Learning', 'Patrons', 'FAQ'].map((link) => (
-                                <a key={link} href="#" className="hover:underline flex items-center gap-2">
+                                <button 
+                                    key={link} 
+                                    onClick={() => handleNavigation(link)}
+                                    className="hover:underline flex items-center gap-2 text-left cursor-pointer"
+                                >
                                     <span>→</span> {link}
-                                </a>
+                                </button>
                             ))}
                         </nav>
                     </div>
@@ -41,11 +91,12 @@ const Footer = () => {
                     <div className="flex flex-col gap-4">
                         <h3 className="text-2xl font-semibold">Support</h3>
                         <nav className="flex flex-col gap-2">
-                            {['Privacy Policy', 'Terms & Conditions'].map((link) => (
-                                <a key={link} href="#" className="hover:underline flex items-center gap-2">
-                                    <span>→</span> {link}
-                                </a>
-                            ))}
+                            <Link to="/privacy-policy" className="hover:underline flex items-center gap-2">
+                                <span>→</span> Privacy Policy
+                            </Link>
+                            <Link to="/terms" className="hover:underline flex items-center gap-2">
+                                <span>→</span> Terms & Conditions
+                            </Link>
                         </nav>
                     </div>
 

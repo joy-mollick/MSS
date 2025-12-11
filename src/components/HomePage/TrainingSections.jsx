@@ -102,10 +102,10 @@ const TrainingSections = () => {
 
                     <div className="flex justify-center gap-6">
                         <div className="w-40 flex items-center justify-center">
-                            <a href="#" target="_blank" rel="noopener noreferrer"><img src={appstore} alt="Apple App Store" /></a>
+                            <a href="https://apps.apple.com/gb/app/cinecertified/id6754809670" target="_blank" rel="noopener noreferrer"><img src={appstore} alt="Apple App Store" /></a>
                         </div>
                         <div className="w-40 flex items-center justify-center">
-                            <a href="#" target="_blank" rel="noopener noreferrer"><img src={playstore} alt="Google Play Store" /></a>
+                            <a href="https://play.google.com/store/apps/details?id=com.cine_certified" target="_blank" rel="noopener noreferrer"><img src={playstore} alt="Google Play Store" /></a>
                         </div>
                     </div>
                 </div>

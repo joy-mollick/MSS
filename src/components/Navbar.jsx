@@ -24,7 +24,11 @@ const Navbar = ({ selectedMenu = 'Home' }) => {
   const handleNavigation = (item) => {
     const { path, section } = sectionMap[item];
     
-    if (section) {
+    if (item === 'Home') {
+      // Home always goes to top and navigates to /
+      navigate(path);
+      window.scrollTo(0, 0);
+    } else if (section) {
       // If we're already on the home page, just scroll to the section
       if (window.location.pathname === '/' || window.location.pathname === '/CineCertifiedWebsite/') {
         const element = document.getElementById(section);
@@ -50,6 +54,11 @@ const Navbar = ({ selectedMenu = 'Home' }) => {
   const handleLogoClick = () => {
     navigate('/');
     window.scrollTo(0, 0);
+  };
+
+  // Toggle function
+  const toggleMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
