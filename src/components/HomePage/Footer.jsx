@@ -1,6 +1,6 @@
 
 
-import bg2 from '@/assets/bg3.png';
+import bg2 from '@/assets/bg3.avif';
 import blackLogo from '@/assets/black-logo.png';
 
 import appstore from '@/assets/appstore.png';
@@ -91,10 +91,10 @@ const Footer = () => {
                     <div className="flex flex-col gap-4">
                         <h3 className="text-2xl font-semibold">Support</h3>
                         <nav className="flex flex-col gap-2">
-                            <Link to="/privacy-policy" className="hover:underline flex items-center gap-2">
+                            <Link to="/privacypolicy" className="hover:underline flex items-center gap-2">
                                 <span>→</span> Privacy Policy
                             </Link>
-                            <Link to="/terms" className="hover:underline flex items-center gap-2">
+                            <Link to="/termsandconditions" className="hover:underline flex items-center gap-2">
                                 <span>→</span> Terms & Conditions
                             </Link>
                         </nav>

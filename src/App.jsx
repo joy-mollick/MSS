@@ -11,8 +11,8 @@ import FAQsPage from './pages/FAQsPage';
 import TraineeDatabasePage from './pages/TraineesDatabasePage';
 import ProfilePage from './pages/ProfilePage';
 import BookingPage from './pages/BookingPage';
-import PrivacyPage from './components/PrivacyPage';
-import TermsPage from './components/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 
 function App() {
 
@@ -31,8 +31,8 @@ function App() {
         <Route path='/trainees' element={<TraineeDatabasePage />} />
         <Route path='/profile' element={<ProfilePage />} />
         <Route path='/booking' element={<BookingPage />} />
-        <Route path='/privacy-policy' element={<PrivacyPage />} />
-        <Route path='/terms' element={<TermsPage />} />
+        <Route path='/privacypolicy' element={<PrivacyPage />} />
+        <Route path='/termsandconditions' element={<TermsPage />} />
       </Routes>
     </Router>
     </>

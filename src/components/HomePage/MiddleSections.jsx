@@ -9,8 +9,8 @@ import why2 from '@/assets/why2.png';
 import why3 from '@/assets/why3.png';
 import why4 from '@/assets/why4.png';
 import icon from '@/assets/icon.png';
-import amb from '@/assets/amb.png';
-import video from '@/assets/video.png';
+import amb from '@/assets/amb.avif';
+import video from '@/assets/video.jpg';
 
 // Why We Built, Video, Standards, Ambassadors Component
 const MiddleSections = () => {

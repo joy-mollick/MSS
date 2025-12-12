@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle2, Play } from "lucide-react";
 
 import icon from '@/assets/icon.png';
-import hero from '@/assets/hero.png';
+import hero from '@/assets/hero.avif';
 
 // Hero and About Section Component
 const HeroSection = () => {

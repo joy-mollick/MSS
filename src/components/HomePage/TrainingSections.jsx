@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle2, Play } from "lucide-react";
 
-import app1 from '@/assets/phone1.png';
-import app2 from '@/assets/phone2.png';
-import app3 from '@/assets/phone3.png';
+import app1 from '@/assets/phone1.avif';
+import app2 from '@/assets/phone2.avif';
+import app3 from '@/assets/phone3.avif';
 import appstore from '@/assets/appstore.png';
 import playstore from '@/assets/playstore.png';
-import firstAid from '@/assets/first-aid.png';
-import safety from '@/assets/safety.png';
+import firstAid from '@/assets/first-aid.avif';
+import safety from '@/assets/safety.avif';
 import icon from '@/assets/icon.png';
 
 import {
@@ -21,7 +21,7 @@ import {
     Database,
     Radio
 } from 'lucide-react';
-import bg from '@/assets/bg.png';
+import bg from '@/assets/bg.avif';
 import { Link } from "react-router-dom";
 
 // Training and App Sections Component

@@ -3,8 +3,8 @@ import { X, Mail } from 'lucide-react'; // Added imports for icons
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/HomePage/Footer';
 
-import news1 from '@/assets/news1.png'; 
-import news2 from '@/assets/news2.png'; 
+import news1 from '@/assets/news1.avif'; 
+import news2 from '@/assets/news2.avif'; 
 
 const NewsPage = () => {
   // State to control the popup visibility

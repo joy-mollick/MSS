@@ -14,9 +14,9 @@ import logo13 from '@/assets/logos/logo13.png'; // Vision Artists
 import logo14 from '@/assets/logos/logo14.png'; // Zeiss
 
 
-import bg from '@/assets/bg.png';
-import news1 from '@/assets/news1.png'; 
-import news2 from '@/assets/news2.png'; 
+import bg from '@/assets/bg.avif';
+import news1 from '@/assets/news1.avif'; 
+import news2 from '@/assets/news2.avif'; 
 import { Calendar, Globe } from "lucide-react";
 import { Link } from 'react-router-dom';
 
@@ -24,20 +24,20 @@ import { Link } from 'react-router-dom';
 const BottomSections = () => {
     
     const patrons = [
-    { id: 1, logo: logo1, name: "ARRI Rental" },
-    { id: 2, logo: logo2, name: "Brownian Motion" },
-    { id: 3, logo: logo3, name: "Digital Orchard" },
-    { id: 4, logo: logo4, name: "Focus Canning" },
-    { id: 5, logo: logo5, name: "Filmsticks" },
-    { id: 6, logo: logo6, name: "Fujifilm" },
-    { id: 7, logo: logo7, name: "No Drama" },
-    { id: 8, logo: logo8, name: "Panavision" },
-    { id: 9, logo: logo9, name: "Red" },
-    { id: 10, logo: logo10, name: "Suz Cruz" },
-    { id: 11, logo: logo11, name: "TLS" },
-    { id: 12, logo: logo12, name: "Verve" },
-    { id: 13, logo: logo13, name: "Vision Artists" },
-    { id: 14, logo: logo14, name: "Zeiss" },
+    { id: 1, logo: logo1, name: "ARRI Rental", website: "https://www.arrirental.com/en" },
+    { id: 2, logo: logo2, name: "Brownian Motion", website: "https://www.brownianmotion.co.uk/" },
+    { id: 3, logo: logo3, name: "Digital Orchard", website: "https://digitalorchardgroup.com/" },
+    { id: 4, logo: logo4, name: "Focus Canning", website: "https://www.focus-canning.com/" },
+    { id: 5, logo: logo5, name: "Filmsticks", website: "https://www.filmsticks.co/?srsltid=AfmBOopBaXUpGrEt9jx5V7barYC3C5yIsZY6H0LUWdAUi_y6eujfzYcD" },
+    { id: 6, logo: logo6, name: "Fujifilm", website: "https://www.fujifilm.com/uk/en" },
+    { id: 7, logo: logo7, name: "No Drama", website: "https://no-drama.co.uk/" },
+    { id: 8, logo: logo8, name: "Panavision", website: "https://uk.panavision.com/" },
+    { id: 9, logo: logo9, name: "Red", website: "https://www.red.com/" },
+    { id: 10, logo: logo10, name: "Suz Cruz", website: "https://www.suzcruz.co.uk/" },
+    { id: 11, logo: logo11, name: "TLS", website: "https://www.truelens.co.uk/" },
+    { id: 12, logo: logo12, name: "Verve", website: "https://verve.film/" },
+    { id: 13, logo: logo13, name: "Vision Artists", website: "https://www.visionartists.co.uk/" },
+    { id: 14, logo: logo14, name: "Zeiss", website: "https://www.zeiss.co.uk/corporate/home.html" },
   ];
   return (
     <>
@@ -82,10 +82,15 @@ const BottomSections = () => {
                 </div>
 
                 {/* Visit Website Button */}
-                <button className="w-full bg-[#FAB614] hover:bg-[#E5970C] text-black font-semibold text-xs py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                <a 
+                  href={patron.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full bg-[#FAB614] hover:bg-[#E5970C] text-black font-semibold text-xs py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                >
                   <Globe size={14} />
                   Visit Website
-                </button>
+                </a>
               </div>
             </div>
           ))}

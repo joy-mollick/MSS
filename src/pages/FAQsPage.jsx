@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/HomePage/Footer';
 import icon from '@/assets/icon.png'
 
-import bg from '@/assets/bg.png';
+import bg from '@/assets/bg.avif';
 
 // Reusable Accordion Item Component
 const FAQItem = ({ question, answer, isOpen, onClick, listItems }) => {

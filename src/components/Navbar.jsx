@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react"; // Import icons
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '@/assets/logo.png';
 
 const Navbar = ({ selectedMenu = 'Home' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -69,7 +70,7 @@ const Navbar = ({ selectedMenu = 'Home' }) => {
           {/* 1. Logo */}
           <button onClick={handleLogoClick} className="flex-shrink-0 z-50 bg-none border-none cursor-pointer">
             <img
-              src="./logo.png"
+              src={logo}
               alt="CineCertified Logo"
               className="h-10 md:h-12 w-auto object-contain"
             />
