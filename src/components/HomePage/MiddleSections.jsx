@@ -11,12 +11,14 @@ import why4 from '@/assets/why4.png';
 import icon from '@/assets/icon.png';
 import amb from '@/assets/amb.avif';
 import video from '@/assets/video.jpg';
+import { VideoModal } from "../VideoModal";
+import { useState } from "react";
 
 // Why We Built, Video, Standards, Ambassadors Component
 const MiddleSections = () => {
+    const [show, setShow] = useState(false)
     return (
         <>
-
             {/* Why We Built This */}
             <section className="relative z-10 container mx-auto px-6 py-16">
                 <div className="max-w-7xl mx-auto">
@@ -82,8 +84,21 @@ const MiddleSections = () => {
             </section>
 
             {/* Video Section */}
+            <VideoModal isOpen={show} onClose={() => setShow(false)} />
+
             <section className="relative z-10 container mx-auto px-6 py-16">
-                <div className="max-w-7xl mx-auto rounded-2xl overflow-hidden relative h-[500px] md:h-[600px]">
+                <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setShow(true)}
+                    className="
+      max-w-7xl mx-auto
+      rounded-2xl overflow-hidden
+      relative
+      h-[280px]
+      sm:h-[350px]
+      md:h-[600px]
+    "
+                >
                     <img
                         src={video}
                         alt="Video Background"
@@ -92,43 +107,104 @@ const MiddleSections = () => {
                 </div>
             </section>
 
+
             {/* Setting Standards */}
-            <section id="professional-development" className="relative z-10 container mx-auto px-6 py-24">
+
+
+            <section
+                id="professional-development"
+                className="relative z-10 container mx-auto px-6 py-24"
+            >
                 <div className="max-w-7xl mx-auto">
+
+                    {/* Header */}
                     <div className="text-center mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold uppercase text-[#FAB614] mb-6">
                             Setting Standards
                         </h2>
+
                         <p className="text-xl text-white/90 max-w-4xl mx-auto">
-                            CINECERTIFIED aims to gradually add all camera department grades to the Logbook App framework. We are working in partnership with the ACO, GBCT and GTC to ensure that the appropriate training standards are met nationally.
+                            CINECERTIFIED aims to gradually add all camera department grades to the
+                            Logbook App framework. We are working in partnership with the ACO, GBCT
+                            and GTC to ensure that the appropriate training standards are met
+                            nationally.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                    {/* Cards Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
                         {[
-                            { name: 'ACO', description: 'Association of Camera Operators - Advancing camera operation excellence', img: setting1 },
-                            { name: 'GBCT', description: 'The Guild of British Camera Technicians - Setting professional standards for camera', img: setting2 },
-                            { name: 'GTC', description: 'The Guild of Television Camera Professionals - Leading television production standards', img: setting3 }
+                            {
+                                name: "ACO",
+                                description:
+                                    "Association of Camera Operators - Advancing camera operation excellence",
+                                img: setting1,
+                            },
+                            {
+                                name: "GBCT",
+                                description:
+                                    "The Guild of British Camera Technicians - Setting professional standards for camera",
+                                img: setting2,
+                            },
+                            {
+                                name: "GTC",
+                                description:
+                                    "The Guild of Television Camera Professionals - Leading television production standards",
+                                img: setting3,
+                            },
                         ].map((org) => (
-                            <div key={org.name} className="bg-gradient-to-br from-[#8B4513]/30 to-[#654321]/30 rounded-xl p-6 border border-[#FAB614]/20">
-                                <img src={org.img} alt={org.name} />
-                                <h3 className="text-2xl font-bold text-white my-2">{org.name}</h3>
-                                <p className="text-white/70">{org.description}</p>
+                            <div
+                                key={org.name}
+                                className="
+            bg-gradient-to-br from-[#8B4513]/30 to-[#654321]/30
+            rounded-xl
+            p-4 md:p-5
+            border border-[#FAB614]/20
+            flex flex-col items-start
+            w-full
+            max-w-[320px]
+          "
+                            >
+                                {/* Image */}
+                                <img
+                                    src={org.img}
+                                    alt={org.name}
+                                    className="w-full h-auto object-contain mb-4"
+                                />
+
+                                <h3 className="text-2xl font-bold text-white mb-2">
+                                    {org.name}
+                                </h3>
+
+                                <p className="text-white/70 text-sm">
+                                    {org.description}
+                                </p>
                             </div>
                         ))}
                     </div>
+
                 </div>
             </section>
 
+
+
             {/* Ambassadors */}
+
+
+
             <section className="relative z-10 container mx-auto px-6 py-16">
                 <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-12">
+
+                    {/* LEFT CONTENT */}
                     <div className="flex flex-col gap-6 flex-1">
                         <h2 className="text-4xl md:text-5xl font-bold uppercase text-[#FAB614]">
                             Who Are Ambassadors?
                         </h2>
 
                         <p className="text-2xl text-white leading-relaxed">
-                            Ambassadors are experienced crew members who volunteer their time to support camera crew within the app. They act as guides and can answer questions through the Ambassador hub.
+                            Ambassadors are experienced crew members who volunteer their time to support
+                            camera crew within the app. They act as guides and can answer questions
+                            through the Ambassador hub.
                         </p>
 
                         <div className="flex flex-col gap-4 mt-4">
@@ -138,7 +214,7 @@ const MiddleSections = () => {
                                 'Maintain industry standards and best practices',
                                 'Volunteer their time to develop the next generation',
                                 'Provide ongoing support and career guidance',
-                                'Bring the camera community together'
+                                'Bring the camera community together',
                             ].map((text) => (
                                 <div key={text} className="flex items-start gap-3">
                                     <img src={icon} alt="Icon" className="w-8 h-8" />
@@ -149,7 +225,6 @@ const MiddleSections = () => {
 
                         <div className="mt-4 p-6 rounded-xl border border-white/10 bg-[#FAB614]/5 backdrop-blur-sm">
                             <div className="flex items-start gap-3 mb-2">
-                                {/* Icon: Circle with Chevron */}
                                 <div className="mt-1 flex items-center justify-center w-5 h-5 rounded-full border border-[#FAB614] text-[#FAB614]">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -166,15 +241,14 @@ const MiddleSections = () => {
                                     </svg>
                                 </div>
 
-                                {/* Heading */}
                                 <p className="text-lg font-medium text-[#FAB614]">
                                     Interested in becoming an ambassador?
                                 </p>
                             </div>
 
-                            {/* Body Text */}
                             <p className="text-white/60 pl-8">
-                                If you share our vision and want to help shape the future of training, get in touch at{' '}
+                                If you share our vision and want to help shape the future of training,
+                                get in touch at{" "}
                                 <a
                                     href="mailto:ambassadors@cinecertified.org"
                                     className="text-white/80 underline underline-offset-4 hover:text-[#FAB614] transition-colors"
@@ -185,15 +259,23 @@ const MiddleSections = () => {
                         </div>
                     </div>
 
-                    <div className="relative flex-shrink-0 w-full lg:w-auto">
+                    {/* RIGHT IMAGE */}
+                    <div className="relative flex-shrink-0 w-full lg:w-auto flex justify-center">
                         <img
                             src={amb}
                             alt="Ambassadors"
-                            className="w-full lg:w-[500px] h-auto"
+                            className="
+          w-[60%]
+          sm:w-[70%]
+          lg:w-[500px]
+          h-auto
+        "
                         />
                     </div>
+
                 </div>
             </section>
+
         </>
     );
 };
