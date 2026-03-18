@@ -15,6 +15,8 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import { auth } from './config';
 import ConfirmationPage from './pages/ConfirmationPage';
+import DonationPage from './pages/DonationPage';
+import FinalAssessment from './pages/FinalAssessment';
 
 function App() {
 
@@ -38,6 +40,7 @@ function App() {
           <Route path='/Confirmation' element={<ConfirmationPage/>}/>
           <Route path='/ancillary-learning' element={<AncillaryLearningPage />} />
           <Route path='/patrons' element={<PatronsPage />} />
+          <Route path='/donation' element={<DonationPage />} />
           <Route path='/news' element={<NewsPage />} />
           <Route path='/faq' element={<FAQsPage />} />
           <Route path='/trainees' element={<TraineeDatabasePage />} />
@@ -45,6 +48,7 @@ function App() {
           <Route path='/booking' element={<BookingPage />} />
           <Route path='/privacypolicy' element={<PrivacyPage />} />
           <Route path='/termsandconditions' element={<TermsPage />} />
+          <Route path='/finalAssessment' element={<FinalAssessment />} />
 
            <Route path='*' element={<HomePage />} />
         </Routes>

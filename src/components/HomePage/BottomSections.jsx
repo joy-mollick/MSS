@@ -13,7 +13,7 @@ import logo12 from '@/assets/logos/logo12.png'; // Verve
 import logo13 from '@/assets/logos/logo13.png'; // Vision Artists
 import logo14 from '@/assets/logos/logo14.png'; // Zeiss
 
-
+import RefflesSection from '../RefflesSection'
 import bg from '@/assets/bg.avif';
 import news1 from '@/assets/news1.avif';
 import news2 from '@/assets/news2.avif';
@@ -82,7 +82,7 @@ const BottomSections = () => {
       <ReadMore article={showNewsDetails == false ? {} : showNewsDetails} isOpen={showNewsDetails} onClose={() => setShowNewsDetails(false)} />
 
       {/* our patrons */}
-    
+
 
       <section className="bg-black py-20 w-full">
         <div id="patrons" className="container mx-auto px-4">
@@ -176,6 +176,7 @@ const BottomSections = () => {
         </div>
       </section>
 
+      <RefflesSection />
 
       {/* Latest News */}
       <section id='news' className="relative z-10 container mx-auto px-6 py-16">

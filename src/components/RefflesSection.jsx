@@ -1,0 +1,823 @@
+import React, { useMemo, useState , useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import {
+    Calendar,
+    CalendarDays,
+    CreditCard,
+    ShieldCheck,
+    Ticket,
+    Trophy,
+    Minus,
+    Plus,
+    X,
+} from "lucide-react";
+import '../App.css'
+import { db, firestore as firestore_db } from '../config'
+import { collection, onSnapshot, doc, updateDoc, increment } from 'firebase/firestore';
+import { ref, onValue, off, push, set } from 'firebase/database';
+const demoRaffles = [
+    {
+        id: 1,
+        title: 'Professional Camera Package',
+        subtitle: 'Sony FX6 Full-Frame Cinema Camera + Sigma Art Lens Kit + Professional Accessories',
+        description:
+            'Win a premium cinema camera package built for professional filmmaking and high-end production.',
+        image:
+            'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1600&auto=format&fit=crop',
+        ticketPrice: 10,
+        totalTickets: 500,
+        soldTickets: 342,
+        drawDate: '2026-03-30T23:59:00',
+        status: 'active',
+    },
+    {
+        id: 2,
+        title: 'Film Production Masterclass',
+        subtitle: '3-Day Intensive Masterclass + Accommodation + Certificate Of Completion',
+        description:
+            'Exclusive 3-day masterclass with award-winning cinematography professionals and practical workshops.',
+        image:
+            'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop',
+        ticketPrice: 15,
+        totalTickets: 200,
+        soldTickets: 178,
+        drawDate: '2026-04-15T23:59:00',
+        status: 'active',
+    },
+    {
+        id: 3,
+        title: 'DJI Ronin 4D Cinema Camera',
+        subtitle: 'DJI Ronin 4D 8K Cinema Camera + Full Accessory Kit + 2TB Storage',
+        description:
+            'State-of-the-art all-in-one cinema camera system with integrated gimbal and LiDAR.',
+        image:
+            'https://images.unsplash.com/photo-1510127034890-ba27508e9f1c?q=80&w=1200&auto=format&fit=crop',
+        ticketPrice: 20,
+        totalTickets: 300,
+        soldTickets: 245,
+        drawDate: '2026-04-20T23:59:00',
+        status: 'active',
+    },
+    {
+        id: 4,
+        title: 'Lighting Equipment Bundle',
+        subtitle: 'ARRI SkyPanel S60-C + Aputure 600D Pro + Light Stands & Modifiers',
+        description:
+            'Complete professional lighting package for studio, location, film and TV production.',
+        image:
+            'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1200&auto=format&fit=crop',
+        ticketPrice: 10,
+        totalTickets: 400,
+        soldTickets: 400,
+        drawDate: '2026-02-28T23:59:00',
+        status: 'closed',
+    },
+    {
+        id: 5,
+        title: 'Wireless Focus System Pro Kit',
+        subtitle: 'Tilta Nucleus-M + Hand Unit + Motors + Full Assistant Camera Bundle',
+        description:
+            'Professional wireless focus control bundle built for demanding film and TV shoots.',
+        image:
+            'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop',
+        ticketPrice: 12,
+        totalTickets: 250,
+        soldTickets: 250,
+        drawDate: '2026-01-30T23:59:00',
+        status: 'closed',
+    },
+];
+
+function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
+}
+
+function getRemainingDays(dateStr) {
+    const now = new Date();
+    const draw = new Date(dateStr);
+    const diff = draw.getTime() - now.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function getProgress(sold, total) {
+    if (!total) return 0;
+    return Math.min(100, Math.round((sold / total) * 100));
+}
+
+function isClosed(raffle) {
+    return raffle.status === 'closed' || new Date(raffle.drawDate).getTime() <= Date.now();
+}
+
+function isUpcoming(raffle) {
+    return !isClosed(raffle);
+}
+
+function Badge({ children, type = 'default' }) {
+    const styleMap = {
+        default: {
+            background: 'rgba(255,255,255,0.06)',
+            color: '#A7AFBD',
+            border: '1px solid rgba(255,255,255,0.08)',
+        },
+        gold: {
+            background: 'rgba(235,180,0,0.14)',
+            color: '#F3BF17',
+            border: '1px solid rgba(235,180,0,0.26)',
+        },
+        green: {
+            background: 'rgba(8, 142, 78, 0.22)',
+            color: '#22E58B',
+            border: '1px solid rgba(34,229,139,0.24)',
+        },
+        gray: {
+            background: 'rgba(120,130,150,0.14)',
+            color: '#B2BAC8',
+            border: '1px solid rgba(120,130,150,0.18)',
+        },
+    };
+
+    return (
+        <div
+            className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold"
+            style={styleMap[type]}
+        >
+            {children}
+        </div>
+    );
+}
+
+function FeaturedStat({ label, value, highlight = false }) {
+    return (
+        <div
+            className="rounded-[16px] px-4 py-3 sm:px-5 sm:py-4 min-h-[82px] flex flex-col justify-center"
+            style={{
+                background: 'rgba(21,21,24,0.78)',
+                border: `1px solid ${highlight ? 'rgba(235,180,0,0.26)' : 'rgba(255,255,255,0.06)'}`,
+                backdropFilter: 'blur(4px)',
+            }}
+        >
+            <div className="text-[#7F8797] text-[12px] sm:text-[14px] font-semibold">{label}</div>
+            <div className={`mt-1 text-[24px] sm:text-[30px] font-extrabold ${highlight ? 'text-[#F2BD16]' : 'text-white'}`}>
+                {value}
+            </div>
+        </div>
+    );
+}
+
+function ProgressBar({ value }) {
+    return (
+        <div className="w-full">
+            <div className="flex items-center justify-between mb-2">
+                <span className="text-white font-semibold text-[13px] sm:text-[14px]">Tickets Sold</span>
+                <span className="text-[#F2BD16] font-bold text-[13px] sm:text-[14px]">{value}%</span>
+            </div>
+
+            <div className="w-full h-[8px] rounded-full bg-white/10 overflow-hidden">
+                <div
+                    className="h-full rounded-full"
+                    style={{
+                        width: `${value}%`,
+                        background: 'linear-gradient(90deg, #F3BF17 0%, #E6A700 100%)',
+                    }}
+                />
+            </div>
+        </div>
+    );
+}
+
+function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
+    const maxTickets = Math.max((raffle?.totalTickets || 0) - (raffle?.soldTickets || 0), 0);
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [ticketCount, setTicketCount] = useState(1);
+
+    if (!raffle) return null;
+
+    const closed = isClosed(raffle);
+    const safeCount = Math.max(1, Math.min(ticketCount, Math.max(maxTickets, 1)));
+    const totalCost = Number(raffle.ticketPrice || 0) * safeCount;
+
+    const dec = () => setTicketCount((p) => Math.max(1, p - 1));
+    const inc = () => setTicketCount((p) => Math.min(Math.max(maxTickets, 1), p + 1));
+
+    return (
+        <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+            <div
+                className="relative w-full max-w-[760px] rounded-[24px] border overflow-hidden"
+                style={{
+                    background: 'linear-gradient(180deg, rgba(30,30,34,0.98) 0%, rgba(24,24,28,0.98) 100%)',
+                    borderColor: 'rgba(77,102,143,0.55)',
+                    boxShadow: '0 28px 80px rgba(0,0,0,0.45)',
+                    maxHeight: 'calc(100vh - 24px)',
+                }}
+            >
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 sm:top-5 sm:right-5 text-[#C2C8D3] hover:text-white transition-colors z-10"
+                >
+                    <X className="w-7 h-7 sm:w-8 sm:h-8" />
+                </button>
+
+                <div className="px-4 sm:px-6 md:px-8 pt-7 sm:pt-8 md:pt-9 pb-5 sm:pb-6 overflow-y-auto max-h-[calc(100vh-24px)]">
+                    <div className="flex flex-col items-center text-center">
+                        <div
+                            className="w-[72px] h-[72px] sm:w-[82px] sm:h-[82px] rounded-full flex items-center justify-center"
+                            style={{ background: 'rgba(110,62,20,0.72)' }}
+                        >
+                            <Ticket className="w-8 h-8 sm:w-9 sm:h-9 text-[#F3BF17]" fill="#F3BF17" />
+                        </div>
+
+                        <h3 className="mt-5 text-white font-bold text-[28px] sm:text-[36px] leading-none">
+                            Enter Raffle
+                        </h3>
+
+                        <p className="mt-3 text-[#9FA8B7] text-[18px] sm:text-[22px] leading-tight">
+                            {raffle.title}
+                        </p>
+                    </div>
+
+                    <div
+                        className="mt-6 rounded-[16px] p-4 sm:p-5"
+                        style={{
+                            background: 'linear-gradient(90deg, rgba(82,48,18,0.65) 0%, rgba(53,34,18,0.65) 100%)',
+                            border: '1px solid rgba(185,102,24,0.42)',
+                        }}
+                    >
+                        <div className="text-[#B6BDC9] text-[15px] sm:text-[17px] font-semibold">Prize</div>
+                        <div className="mt-3 text-white font-bold text-[18px] sm:text-[22px] leading-[1.25]">
+                            {raffle.subtitle}
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <label className="block text-white font-bold text-[18px] sm:text-[20px] mb-3">
+                            Full Name
+                        </label>
+                        <input
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="w-full h-[58px] sm:h-[64px] rounded-[16px] px-5 text-[20px] sm:text-[22px] text-white placeholder:text-[#8E96A4] outline-none"
+                            style={{
+                                background: '#050608',
+                                border: '1px solid rgba(77,102,143,0.7)',
+                            }}
+                            placeholder="Full Name"
+                        />
+                    </div>
+
+                    <div className="mt-4">
+                        <label className="block text-white font-bold text-[18px] sm:text-[20px] mb-3">
+                            Email Address
+                        </label>
+                        <input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full h-[58px] sm:h-[64px] rounded-[16px] px-5 text-[20px] sm:text-[22px] text-white placeholder:text-[#8E96A4] outline-none"
+                            style={{
+                                background: '#050608',
+                                border: '1px solid rgba(77,102,143,0.7)',
+                            }}
+                            placeholder="Email Address"
+                        />
+                    </div>
+
+                    <div className="mt-4">
+                        <label className="block text-white font-bold text-[18px] sm:text-[20px] mb-3">
+                            Number of Tickets
+                        </label>
+
+                        <div className="grid grid-cols-[58px_1fr_58px] sm:grid-cols-[64px_1fr_64px] gap-3 items-center">
+                            <button
+                                type="button"
+                                onClick={dec}
+                                className="h-[58px] sm:h-[64px] rounded-[14px] flex items-center justify-center text-white"
+                                style={{
+                                    background: '#050608',
+                                    border: '1px solid rgba(77,102,143,0.7)',
+                                }}
+                            >
+                                <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
+                            </button>
+
+                            <div
+                                className="h-[58px] sm:h-[64px] rounded-[14px] flex items-center justify-center text-white font-bold text-[24px] sm:text-[28px]"
+                                style={{
+                                    background: '#050608',
+                                    border: '1px solid rgba(77,102,143,0.7)',
+                                }}
+                            >
+                                {safeCount}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={inc}
+                                className="h-[58px] sm:h-[64px] rounded-[14px] flex items-center justify-center text-white"
+                                style={{
+                                    background: '#050608',
+                                    border: '1px solid rgba(77,102,143,0.7)',
+                                }}
+                            >
+                                <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+                            </button>
+                        </div>
+
+                        <p className="mt-2 text-[#9FA8B7] text-[14px] sm:text-[16px]">
+                            Maximum {maxTickets} tickets available
+                        </p>
+                    </div>
+
+                    <div
+                        className="mt-5 rounded-[16px] p-4 sm:p-5"
+                        style={{
+                            background: '#050608',
+                            border: '1px solid rgba(77,102,143,0.7)',
+                        }}
+                    >
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <div className="text-[#A0A8B7] text-[18px] sm:text-[20px]">Ticket Price</div>
+                                <div className="mt-3 text-[#A0A8B7] text-[18px] sm:text-[20px]">Quantity</div>
+                            </div>
+
+                            <div className="text-right">
+                                <div className="text-white font-bold text-[18px] sm:text-[20px]">£{raffle.ticketPrice}</div>
+                                <div className="mt-3 text-white font-bold text-[18px] sm:text-[20px]">×{safeCount}</div>
+                            </div>
+                        </div>
+
+                        <div className="my-4 h-px bg-[#43506B]" />
+
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="text-white font-bold text-[22px] sm:text-[26px]">Total Cost</div>
+                            <div className="text-[#F3BF17] font-extrabold text-[30px] sm:text-[36px]">£{totalCost}</div>
+                        </div>
+                    </div>
+
+                    <div
+                        className="mt-5 rounded-[16px] p-4 sm:p-5"
+                        style={{
+                            background: '#050608',
+                            border: '1px solid rgba(77,102,143,0.7)',
+                        }}
+                    >
+                        <div className="flex items-center gap-3 text-[#A0A8B7] text-[16px] sm:text-[18px]">
+                            <CreditCard className="w-5 h-5" />
+                            <span>Payment Method: Stripe</span>
+                        </div>
+
+                        <div className="mt-3 flex items-center gap-3 text-[#A0A8B7] text-[16px] sm:text-[18px]">
+                            <ShieldCheck className="w-5 h-5" />
+                            <span>Secure & encrypted payment</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-5">
+                        <Button
+                            disabled={closed || entering || !fullName || !email}
+                            onClick={async () => {
+                                const ok = await onConfirm?.({
+                                    fullName,
+                                    email,
+                                    ticketCount: safeCount,
+                                    totalCost,
+                                });
+
+                                if (!ok) {
+                                    alert("Failed to enter raffle");
+                                }
+                            }}
+                            className="bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-bold text-lg h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3 w-full justify-center !h-[60px] sm:!h-[66px] !text-[18px] sm:!text-[20px]"
+                        >
+                            <Ticket className="h-5 w-5 sm:h-6 sm:w-6" />
+                            {closed ? 'Raffle Closed' : entering ? 'Processing...' : 'Pay & Enter Raffle'}
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function FeaturedRaffleCard({ raffle, onEnter }) {
+    const progress = getProgress(raffle.soldTickets, raffle.totalTickets);
+    const left = Math.max(raffle.totalTickets - raffle.soldTickets, 0);
+
+    return (
+        <div
+            className="relative overflow-hidden rounded-[24px] border"
+            style={{
+                borderColor: 'rgba(235,180,0,0.55)',
+                background: '#111214',
+                boxShadow: '0 18px 50px rgba(0,0,0,0.28)',
+            }}
+        >
+            <div
+                className="absolute inset-0"
+                style={{
+                    backgroundImage: `url(${raffle.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    opacity: 0.42,
+                }}
+            />
+            <div
+                className="absolute inset-0"
+                style={{
+                    background:
+                        'linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 38%, rgba(0,0,0,0.48) 70%, rgba(255,255,255,0.10) 100%)',
+                }}
+            />
+
+            <div className="relative z-10 p-5 sm:p-7 md:p-8">
+                <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.3fr_1fr] lg:gap-8">
+                    <div>
+                        <div className="flex flex-wrap items-center gap-3 mb-5">
+                            <Badge type="green">
+                                <span className="w-2 h-2 rounded-full bg-[#22E58B]" />
+                                FEATURED DRAW
+                            </Badge>
+                            <Badge type="gold">£{raffle.ticketPrice} / ticket</Badge>
+                        </div>
+
+                        <h3 className="text-white font-bold leading-tight text-[28px] md:text-[36px] lg:text-[42px] uppercase">
+                            {raffle.title}
+                        </h3>
+
+                        <div
+                            className="mt-5 rounded-[16px] p-4 sm:p-5 max-w-[560px]"
+                            style={{
+                                background: 'rgba(37, 28, 9, 0.55)',
+                                border: '1px solid rgba(235,180,0,0.18)',
+                            }}
+                        >
+                            <div className="flex items-start gap-3">
+                                <div
+                                    className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                                    style={{ background: 'rgba(235,180,0,0.16)' }}
+                                >
+                                    <Trophy className="w-5 h-5 text-[#F2BD16]" />
+                                </div>
+
+                                <div>
+                                    <div className="text-[#F2BD16] text-[11px] sm:text-[12px] font-bold mb-1">Prize</div>
+                                    <div className="text-white text-[15px] sm:text-[18px] font-medium leading-snug">
+                                        {raffle.subtitle}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-7">
+                            <Button
+                                onClick={() => onEnter(raffle)}
+                                className="bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-bold text-lg h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3"
+                            >
+                                <Calendar className="h-6 w-6" />
+                                Enter This Raffle
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col justify-between">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <FeaturedStat label="Total" value={raffle.totalTickets} />
+                            <FeaturedStat label="Sold" value={raffle.soldTickets} />
+                            <FeaturedStat label="Left" value={left} highlight />
+                        </div>
+
+                        <div className="mt-6">
+                            <ProgressBar value={progress} />
+                        </div>
+
+                        <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="inline-flex items-center gap-2 text-[#9AA3B2] text-[13px] sm:text-[15px]">
+                                <CalendarDays className="w-4 h-4 text-[#F2BD16]" />
+                                Draw closes: {formatDate(raffle.drawDate)}
+                            </div>
+
+                            <Badge type="gold">{getRemainingDays(raffle.drawDate)} days left</Badge>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function SmallRaffleCard({ raffle, onEnter }) {
+    const progress = getProgress(raffle.soldTickets, raffle.totalTickets);
+    const left = Math.max(raffle.totalTickets - raffle.soldTickets, 0);
+    const closed = isClosed(raffle);
+
+    return (
+        <div
+            className="overflow-hidden rounded-[20px] border h-full"
+            style={{
+                background: 'linear-gradient(180deg, rgba(16,17,20,0.98) 0%, rgba(11,12,15,0.98) 100%)',
+                borderColor: closed ? 'rgba(120,130,150,0.18)' : 'rgba(235,180,0,0.25)',
+                boxShadow: '0 14px 40px rgba(0,0,0,0.22)',
+            }}
+        >
+            <div className="relative h-[220px] sm:h-[240px]">
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        backgroundImage: `url(${raffle.image})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        filter: closed ? 'grayscale(20%)' : 'none',
+                    }}
+                />
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background:
+                            'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0.86) 100%)',
+                    }}
+                />
+
+                <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-3">
+                    <Badge type="gold">£{raffle.ticketPrice} / ticket</Badge>
+                    <Badge type={closed ? 'gray' : 'green'}>{closed ? 'Closed' : 'Active'}</Badge>
+                </div>
+            </div>
+
+            <div className="p-5">
+                <h4 className="text-white font-bold text-[24px] md:text-[28px] leading-tight uppercase">
+                    {raffle.title}
+                </h4>
+
+                <p className="mt-3 text-white/70 text-[15px] md:text-[16px] leading-relaxed">
+                    {raffle.description}
+                </p>
+
+                <div
+                    className="mt-5 rounded-[14px] p-4"
+                    style={{
+                        background: 'rgba(37, 28, 9, 0.45)',
+                        border: '1px solid rgba(235,180,0,0.12)',
+                    }}
+                >
+                    <div className="flex items-start gap-3">
+                        <div
+                            className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                            style={{ background: 'rgba(235,180,0,0.14)' }}
+                        >
+                            <Trophy className="w-4 h-4 text-[#F2BD16]" />
+                        </div>
+
+                        <div>
+                            <div className="text-[#F2BD16] text-[11px] font-bold mb-1">Prize</div>
+                            <div className="text-white text-[14px] sm:text-[15px] leading-snug">{raffle.subtitle}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-5">
+                    <div
+                        className="rounded-[14px] p-4"
+                        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+                    >
+                        <div className="text-[#6D7584] text-[11px] font-semibold">Sold</div>
+                        <div className="text-white text-[26px] font-extrabold mt-1">{raffle.soldTickets}</div>
+                    </div>
+
+                    <div
+                        className="rounded-[14px] p-4"
+                        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+                    >
+                        <div className="text-[#F2BD16] text-[11px] font-semibold">Left</div>
+                        <div className="text-[#F2BD16] text-[26px] font-extrabold mt-1">{left}</div>
+                    </div>
+                </div>
+
+                <div className="mt-5">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-[#6D7584] text-[12px] font-semibold">Progress</span>
+                        <span className="text-[#F2BD16] text-[13px] font-bold">{progress}%</span>
+                    </div>
+
+                    <div className="w-full h-[7px] rounded-full bg-white/10 overflow-hidden">
+                        <div
+                            className="h-full rounded-full"
+                            style={{
+                                width: `${progress}%`,
+                                background: 'linear-gradient(90deg, #F3BF17 0%, #E6A700 100%)',
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-5 flex items-center gap-2 text-[#6D7584] text-[13px]">
+                    <CalendarDays className="w-4 h-4 text-[#F2BD16]" />
+                    Closes: {formatDate(raffle.drawDate)}
+                </div>
+
+                <div className="mt-6">
+                    <Button
+                        onClick={() => !closed && onEnter(raffle)}
+                        disabled={closed}
+                        className={`bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-bold text-lg h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3 w-full justify-center ${closed ? '!bg-[#1C2331] !text-[#677084] shadow-none cursor-not-allowed' : ''
+                            }`}
+                    >
+                        <Calendar className="h-5 w-5" />
+                        {closed ? 'Raffle Closed' : 'Enter Raffle'}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const RafflesSection = () => {
+
+
+    const [selectedRaffle, setSelectedRaffle] = useState(null);
+    const [raffles, setRaffles] = useState([]);
+    const [entriesMap, setEntriesMap] = useState({});
+    const [load, setLoad] = useState(true);
+    const [entering, setEntering] = useState(false);
+
+    useEffect(() => {
+        const unsub = onSnapshot(collection(firestore_db, "raffles"), (snapshot) => {
+            const arr = snapshot.docs.map((d) => ({
+                id: d.id,
+                ...d.data(),
+            }));
+
+            arr.sort((a, b) => {
+                const at = a?.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0;
+                const bt = b?.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0;
+                return bt - at;
+            });
+
+            setRaffles(arr);
+            setLoad(false);
+        });
+
+        return () => unsub();
+    }, []);
+
+    useEffect(() => {
+        const entriesRef = ref(db, "raffle_entries");
+
+        const callback = onValue(entriesRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            setEntriesMap(data);
+        });
+
+        return () => off(entriesRef, "value", callback);
+    }, []);
+
+    const rafflesWithEntries = useMemo(() => {
+        return raffles.map((item) => {
+            const rawEntries = entriesMap?.[item.id] ? Object.values(entriesMap[item.id]) : [];
+            const soldFromEntries = rawEntries.reduce((sum, entry) => sum + Number(entry.tickets || 0), 0);
+
+            return {
+                ...item,
+                image:
+                    Array.isArray(item.attachmentUrls) &&
+                        item.attachmentUrls.find((f) => String(f.type || "").includes("image"))?.url
+                        ? item.attachmentUrls.find((f) => String(f.type || "").includes("image"))?.url
+                        : item.image || "",
+                ticketPrice: Number(item.price || 0),
+                totalTickets: Number(item.total || 0),
+                soldTickets: Number(item.sold ?? soldFromEntries ?? 0),
+                drawDate: item.drawnDate,
+                entries: rawEntries,
+            };
+        });
+    }, [raffles, entriesMap]);
+
+    const featuredRaffle = useMemo(() => {
+        const upcoming = rafflesWithEntries
+            .filter(isUpcoming)
+            .sort((a, b) => new Date(a.drawDate).getTime() - new Date(b.drawDate).getTime());
+
+        return upcoming.length > 0 ? upcoming[0] : null;
+    }, [rafflesWithEntries]);
+
+    const otherRaffles = useMemo(() => {
+        const others = [...rafflesWithEntries].filter((item) => item.id !== featuredRaffle?.id);
+
+        return others.sort((a, b) => {
+            const aClosed = isClosed(a);
+            const bClosed = isClosed(b);
+
+            if (aClosed !== bClosed) return aClosed ? 1 : -1;
+            return new Date(a.drawDate).getTime() - new Date(b.drawDate).getTime();
+        });
+    }, [rafflesWithEntries, featuredRaffle]);
+
+    async function submitRaffleEntry(raffle, payload) {
+        try {
+            if (!raffle?.id) return false;
+
+            setEntering(true);
+
+            const newRef = push(ref(db, `raffle_entries/${raffle.id}`));
+
+            await set(newRef, {
+                name: payload.fullName,
+                email: payload.email,
+                tickets: Number(payload.ticketCount || 1),
+                totalPaid: Number(payload.totalCost || 0),
+                signUpDate: new Date().toISOString(),
+                entryDate: new Date().toISOString(),
+                createdAt: Date.now(),
+            });
+
+            await updateDoc(doc(firestore_db, "raffles", String(raffle.id)), {
+                sold: increment(Number(payload.ticketCount || 1)),
+            });
+
+            setSelectedRaffle(null);
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        } finally {
+            setEntering(false);
+        }
+    }
+
+    return (
+        <>
+            <section className="relative z-10 container mx-auto px-6 pt-20 pb-10">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col items-center gap-6 text-center mb-10 sm:mb-12">
+                        <h2 className="text-4xl md:text-4xl lg:text-5xl font-bold leading-tight uppercase">
+                            <span className="text-[#FAB614] block md:inline">
+                                Active
+                            </span>{' '}
+                            <span className="text-white block md:inline">
+                                Raffles
+                            </span>
+                        </h2>
+
+                        <div className="max-w-5xl">
+                            <p className="text-lg md:text-xl text-white/90 leading-relaxed">
+                                <span className="font-bold">
+                                    Enter for a chance to win incredible prizes.
+                                </span>
+                                <br />
+                                Every ticket supports world-class camera training across the UK.
+                            </p>
+                        </div>
+                    </div>
+
+                    {load ? (
+                        <div className="text-center text-white/70 py-10">Loading raffles...</div>
+                    ) : null}
+
+                    {!load && featuredRaffle && (
+                        <FeaturedRaffleCard raffle={featuredRaffle} onEnter={setSelectedRaffle} />
+                    )}
+
+                    {!load && otherRaffles.length > 0 && (
+                        <div className="mt-7 sm:mt-8">
+                            <div
+                                className="flex gap-5 sm:gap-6 overflow-x-auto pb-3"
+                                style={{
+                                    scrollbarWidth: 'thin',
+                                    scrollbarColor: '#E9A700 rgba(255,255,255,0.08)',
+                                }}
+                            >
+                                {otherRaffles.map((raffle) => (
+                                    <div
+                                        key={raffle.id}
+                                        className="flex-shrink-0 w-[88vw] sm:w-[420px] lg:w-[430px]"
+                                    >
+                                        <SmallRaffleCard
+                                            raffle={raffle}
+                                            onEnter={setSelectedRaffle}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            </section>
+
+            {selectedRaffle && (
+                <EnterRaffleModal
+                    raffle={selectedRaffle}
+                    onClose={() => setSelectedRaffle(null)}
+                    entering={entering}
+                    onConfirm={(payload) => submitRaffleEntry(selectedRaffle, payload)}
+                />
+            )}
+        </>
+    );
+};
+
+export default RafflesSection;

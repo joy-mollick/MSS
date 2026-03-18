@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import Navbar from '@/components/Navbar';
+import RefflesSection from '@/components/RefflesSection';
 import HeroSection from '@/components/HomePage/HeroSection';
 import MiddleSections from '@/components/HomePage/MiddleSections';
 import TrainingSections from '@/components/HomePage/TrainingSections';
