@@ -21,111 +21,114 @@ import { Calendar, Globe } from "lucide-react";
 
 const PatronsPage = () => {
   const patrons = [
-      { id: 1, logo: logo1, name: "ARRI Rental", website: "https://www.arrirental.com/en" },
-      { id: 2, logo: logo2, name: "Brownian Motion", website: "https://www.brownianmotion.co.uk/" },
-      { id: 3, logo: logo3, name: "Digital Orchard", website: "https://digitalorchardgroup.com/" },
-      { id: 4, logo: logo4, name: "Focus Canning", website: "https://www.focus-canning.com/" },
-      { id: 5, logo: logo5, name: "Filmsticks", website: "https://www.filmsticks.co/?srsltid=AfmBOopBaXUpGrEt9jx5V7barYC3C5yIsZY6H0LUWdAUi_y6eujfzYcD" },
-      { id: 6, logo: logo6, name: "Fujifilm", website: "https://www.fujifilm.com/uk/en" },
-      { id: 7, logo: logo7, name: "No Drama", website: "https://no-drama.co.uk/" },
-      { id: 8, logo: logo8, name: "Panavision", website: "https://uk.panavision.com/" },
-      { id: 9, logo: logo9, name: "Red", website: "https://www.red.com/" },
-      { id: 10, logo: logo10, name: "Suz Cruz", website: "https://www.suzcruz.co.uk/" },
-      { id: 11, logo: logo11, name: "TLS", website: "https://www.truelens.co.uk/" },
-      { id: 12, logo: logo12, name: "Verve", website: "https://verve.film/" },
-      { id: 13, logo: logo13, name: "Vision Artists", website: "https://www.visionartists.co.uk/" },
-      { id: 14, logo: logo14, name: "Zeiss", website: "https://www.zeiss.co.uk/corporate/home.html" },
-    ];
+    { id: 1, logo: logo1, name: "ARRI Rental", website: "https://www.arrirental.com/en" },
+    { id: 2, logo: logo2, name: "Brownian Motion", website: "https://www.brownianmotion.co.uk/" },
+    { id: 3, logo: logo3, name: "Digital Orchard", website: "https://digitalorchardgroup.com/" },
+    { id: 5, logo: logo5, name: "Filmsticks", website: "https://www.filmsticks.co/?srsltid=AfmBOopBaXUpGrEt9jx5V7barYC3C5yIsZY6H0LUWdAUi_y6eujfzYcD" },
+    { id: 6, logo: logo6, name: "Fujifilm", website: "https://www.fujifilm.com/uk/en" },
+    { id: 7, logo: logo7, name: "No Drama", website: "https://no-drama.co.uk/" },
+    { id: 8, logo: logo8, name: "Panavision", website: "https://uk.panavision.com/" },
+    { id: 9, logo: logo9, name: "Red", website: "https://www.red.com/" },
+    { id: 10, logo: logo10, name: "Suz Cruz", website: "https://www.suzcruz.co.uk/" },
+    { id: 11, logo: logo11, name: "TLS", website: "https://www.truelens.co.uk/" },
+    { id: 12, logo: logo12, name: "Verve", website: "https://verve.film/" },
+    { id: 14, logo: logo14, name: "Zeiss", website: "https://www.zeiss.co.uk/corporate/home.html" },
+  ];
 
-const supporters = [
-  "ACO",
-  "Atlas Lens Co.",
-  "Bebob",
-  "Bectu Camera Branch",
-  "British Cinematographer",
-  "Bright Tangerine",
-  "Brownian Motion",
-  "CameraWorks",
-  "Case Design",
-  "CineAero",
-  "CineArk",
-  "CineArray",
-  "Cinelab Film & Digital",
-  "CineParts",
-  "Cooke Optics",
-  "CVP",
-  "Digital Orchard",
-  "Easyrig",
-  "Emmyland",
-  "Film Crew Apparel",
-  "FilmFix",
-  "Filmsticks",
-  "Focus Canning",
-  "FocusBug",
-  "FOG Creative",
-  "FOMO Rentals / FOMO House",
-  "Forty One Thirty",
-  "Fujifilm UK",
-  "Future In Film",
-  "GBCT",
-  "Gravy Crew",
-  "Grip Factory Munich (GFM)",
-  "GTC",
-  "Hawk UK",
-  "Holdan",
-  "Holistic Grips",
-  "Hydra Distribution",
-  "Irwin Blake",
-  "KitStart",
-  "Kodak",
-  "Leitz",
-  "London Commercial DITs",
-  "Mark Milsome Foundation",
-  "Marzano Films",
-  "MCX Films",
-  "Mission Digital",
-  "Mr. Helix",
-  "No Drama",
-  "Notorious DIT",
-  "One Stop Films",
-  "Optical Support",
-  "Orchard Crew",
-  "Panavision",
-  "Progressive Broadcast Hire",
-  "Rebel Colour",
-  "RED Digital Cinema",
-  "Rexy Gaming",
-  "RSVP",
-  "S+O Media",
-  "Samas Cases",
-  "Screen Sisters",
-  "Sea Star Rental",
-  "Second Reef",
-  "Shoot Blue",
-  "Somerset Film",
-  "SONY",
-  "Sunbelt Rentals",
-  "SuzCruz",
-  "T-Stop Aerials",
-  "Tentacle Sound",
-  "That's A Wrap (TAW)",
-  "The Helicopter Girls",
-  "TheCallSheet.co.uk",
-  "The Grip Company (TGC)",
-  "The Underwater Company",
-  "Tiffen Filters",
-  "True Lens Services (TLS)",
-  "VERVE.film",
-  "Vision Artists Diary Service",
-  "VMI",
-  "We Love Hue",
-  "Women Behind The Camera",
-  "ZEISS",
+  const supporters = [
+    "ACO",
+    "All Set in West",
+    "Atlas Lens Co.",
+    "Bebob",
+    "Bectu Camera Branch",
+    "British Cinematographer",
+    "Bright Tangerine",
+    "Brownian Motion",
+    "CameraWorks",
+    "Case Design",
+    "CineAero",
+    "CineArk",
+    "CineArray",
+    "Cinelab Film & Digital",
+    "CineParts",
+    "Cooke Optics",
+    "CVP",
+    "Digital Orchard",
+    "Easyrig",
+    "Emmyland",
+    "Film Crew Apparel",
+    "FilmFix",
+    "Films@59",
+    "Filmsticks",
+    "Focus Canning",
+    "FocusBug",
+    "FOG Creative",
+    "FOMO Rentals / FOMO House",
+    "Forty One Thirty",
+    "Fujifilm UK",
+    "Future In Film",
+    "GBCT",
+    "Gravy Crew",
+    "Grip Factory Munich (GFM)",
+    "GTC",
+    "Hawk UK",
+    "Holdan",
+    "Holistic Grips",
+    "Hydra Distribution",
+    "IMIS",
+    "Irwin Cine",
+    "JGA",
+    "KitStart",
+    "Kodak",
+    "Leitz",
+    "London Commercial DITs",
+    "Mark Milsome Foundation",
+    "Marzano Films",
+    "MCX Films",
+    "Mission Digital",
+    "Mr. Helix",
+    "No Drama",
+    "Notorious DIT",
+    "One Stop Films",
+    "Optical Support",
+    "Orchard Crew",
+    "Panavision",
+    "Progressive Broadcast Hire",
+    "RATE",
+    "Rebel Colour",
+    "RED Digital Cinema",
+    "Rexy Gaming",
+    "RSVP",
+    "S+O Media",
+    "Samas Cases",
+    "Screen Sisters",
+    "Sea Star Rental",
+    "Second Reef",
+    "Shoot Blue",
+    "Somerset Film",
+    "SONY",
+    "Stuck in Film",
+    "Sunbelt Rentals",
+    "SuzCruz",
+    "T-Stop Aerials",
+    "Tentacle Sound",
+    "That's A Wrap (TAW)",
+    "The Helicopter Girls",
+    "The Grip Company (TGC)",
+    "The Underwater Company",
+    "TheCallSheet.co.uk",
+    "Tiffen Filters",
+    "True Lens Services (TLS)",
+    "VERVE.film",
+    "Vision Artists Diary Service",
+    "VMI",
+    "We Love Hue",
+    "Women Behind The Camera",
+    "ZEISS",
 
-  // Numbers at the end
-  "121 Diary",
-  "24-7 Drama"
-];
+    "121 Diary",
+    "24-7 Drama"
+  ]
 
   return (
     <>
@@ -178,15 +181,15 @@ const supporters = [
                     </div>
 
                     {/* Visit Website Button */}
-                <a 
-                  href={patron.website} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="w-full bg-[#FAB614] hover:bg-[#E5970C] text-black font-semibold text-xs py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                >
-                  <Globe size={14} />
-                  Visit Website
-                </a>
+                    <a
+                      href={patron.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-[#FAB614] hover:bg-[#E5970C] text-black font-semibold text-xs py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <Globe size={14} />
+                      Visit Website
+                    </a>
                   </div>
                 </div>
               ))}
@@ -196,34 +199,47 @@ const supporters = [
 
 
         <section className="bg-black max-w-5xl md:max-w-6xl mx-auto py-4 w-full">
-      <div className="container mx-auto px-4">
-        
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#FAB614] uppercase tracking-wider mb-6">
-            Our Supporters
-          </h2>
-          <p className="text-white/80 text-lg max-w-4xl mx-auto leading-relaxed">
-            CineCertified is an initiative representing the camera department in the UK film, television and advertising sectors, built with the support of a wide array of companies:
-          </p>
-        </div>
+          <div className="container mx-auto px-4">
 
-        {/* Supporters Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {supporters.map((supporter, index) => (
-            <div 
-              key={index}
-              className="group relative bg-[#1A1A1A] border border-[#FAB614]/30 rounded-lg p-4 flex items-center justify-center text-center h-16 hover:border-[#FAB614] hover:bg-[#FAB614]/10 transition-all duration-300 cursor-default"
-            >
-              <span className="text-white text-sm font-medium group-hover:text-[#FAB614] transition-colors">
-                {supporter}
-              </span>
+            {/* Header Section */}
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-[#FAB614] uppercase tracking-wider mb-6">
+                Our Supporters
+              </h2>
+              <p className="text-white/80 text-lg max-w-4xl mx-auto leading-relaxed">
+                CineCertified is an initiative representing the camera department in the UK film, television and advertising sectors, built with the support of a wide array of companies:
+              </p>
             </div>
-          ))}
-        </div>
 
-      </div>
-    </section>
+            {/* Supporters Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {supporters.map((supporter, index) => {
+                const isLast = index === supporters.length - 1;
+                const singleItemLastRowLg = supporters.length % 5 === 1;
+                const singleItemLastRowMd = supporters.length % 3 === 1;
+                const singleItemLastRowSm = supporters.length % 2 === 1;
+
+                return (
+                  <div
+                    key={index}
+                    className={`group relative bg-[#1A1A1A] border border-[#FAB614]/30 rounded-lg p-4 flex items-center justify-center text-center h-16 hover:border-[#FAB614] hover:bg-[#FAB614]/10 transition-all duration-300 cursor-default
+          ${isLast && singleItemLastRowSm ? "col-start-1 col-end-3 justify-self-center w-full max-w-[300px]" : ""}
+          ${isLast && singleItemLastRowMd ? "md:col-start-2 md:col-end-3" : ""}
+          ${isLast && singleItemLastRowLg ? "lg:col-start-3 lg:col-end-4" : ""}
+        `}
+                  >
+                    <span className="text-white text-sm font-medium group-hover:text-[#FAB614] transition-colors">
+                      {supporter}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+         
+
+          </div>
+        </section>
 
         <Footer />
       </div>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState , useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     Calendar,
@@ -15,6 +15,7 @@ import '../App.css'
 import { db, firestore as firestore_db } from '../config'
 import { collection, onSnapshot, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, onValue, off, push, set } from 'firebase/database';
+
 const demoRaffles = [
     {
         id: 1,
@@ -191,52 +192,82 @@ function ProgressBar({ value }) {
 }
 
 function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
-    const maxTickets = Math.max((raffle?.totalTickets || 0) - (raffle?.soldTickets || 0), 0);
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
-    const [ticketCount, setTicketCount] = useState(1);
 
     if (!raffle) return null;
 
     const closed = isClosed(raffle);
-    const safeCount = Math.max(1, Math.min(ticketCount, Math.max(maxTickets, 1)));
-    const totalCost = Number(raffle.ticketPrice || 0) * safeCount;
+    const maxTickets = Math.max((raffle?.totalTickets || 0) - (raffle?.soldTickets || 0), 0);
 
-    const dec = () => setTicketCount((p) => Math.max(1, p - 1));
-    const inc = () => setTicketCount((p) => Math.min(Math.max(maxTickets, 1), p + 1));
+    const packageDeals =
+        Array.isArray(raffle?.packageDeals) && raffle.packageDeals.length > 0
+            ? raffle.packageDeals
+            : [
+                {
+                    id: 'default-package',
+                    tickets: 1,
+                    price: Number(raffle?.ticketPrice || 0),
+                    badge: '',
+                },
+            ];
+
+    const validPackages = packageDeals
+        .map((pkg, idx) => ({
+            id: pkg?.id || `pkg-${idx}`,
+            tickets: Number(pkg?.tickets || 0),
+            price: Number(pkg?.price || 0),
+            badge: pkg?.badge || '',
+        }))
+        .filter((pkg) => pkg.tickets > 0 && pkg.price > 0 && pkg.tickets <= Math.max(maxTickets, 0));
+
+    const initialSelected = validPackages[0]?.id || null;
+    const [selectedPackageId, setSelectedPackageId] = useState(initialSelected);
+
+    useEffect(() => {
+        setSelectedPackageId(validPackages[0]?.id || null);
+    }, [raffle?.id]);
+
+    const selectedPackage =
+        validPackages.find((pkg) => pkg.id === selectedPackageId) || validPackages[0] || null;
+
+    const totalCost = Number(selectedPackage?.price || 0);
+    const ticketCount = Number(selectedPackage?.tickets || 0);
+    const perTicket =
+        ticketCount > 0 && totalCost > 0 ? (totalCost / ticketCount).toFixed(2) : null;
 
     return (
         <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
             <div
-                className="relative w-full max-w-[760px] rounded-[24px] border overflow-hidden"
+                className="relative w-full max-w-[720px] rounded-[24px] overflow-hidden border"
                 style={{
-                    background: 'linear-gradient(180deg, rgba(30,30,34,0.98) 0%, rgba(24,24,28,0.98) 100%)',
+                    background: 'linear-gradient(180deg, rgba(31,31,34,0.98) 0%, rgba(26,26,29,0.98) 100%)',
                     borderColor: 'rgba(77,102,143,0.55)',
-                    boxShadow: '0 28px 80px rgba(0,0,0,0.45)',
-                    maxHeight: 'calc(100vh - 24px)',
+                    boxShadow: '0 24px 70px rgba(0,0,0,0.46)',
+                    maxHeight: 'calc(100vh - 28px)',
                 }}
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 sm:top-5 sm:right-5 text-[#C2C8D3] hover:text-white transition-colors z-10"
+                    className="absolute top-4 right-4 sm:top-5 sm:right-5 text-[#B8C0CE] hover:text-white transition-colors z-10"
                 >
                     <X className="w-7 h-7 sm:w-8 sm:h-8" />
                 </button>
 
-                <div className="px-4 sm:px-6 md:px-8 pt-7 sm:pt-8 md:pt-9 pb-5 sm:pb-6 overflow-y-auto max-h-[calc(100vh-24px)]">
+                <div className="px-4 sm:px-5 md:px-6 py-5 sm:py-6 overflow-y-auto max-h-[calc(100vh-28px)]">
                     <div className="flex flex-col items-center text-center">
                         <div
-                            className="w-[72px] h-[72px] sm:w-[82px] sm:h-[82px] rounded-full flex items-center justify-center"
-                            style={{ background: 'rgba(110,62,20,0.72)' }}
+                            className="w-[74px] h-[74px] rounded-full flex items-center justify-center"
+                            style={{ background: 'rgba(108, 64, 18, 0.72)' }}
                         >
-                            <Ticket className="w-8 h-8 sm:w-9 sm:h-9 text-[#F3BF17]" fill="#F3BF17" />
+                            <Ticket className="w-8 h-8 text-[#F3BF17]" fill="#F3BF17" />
                         </div>
 
-                        <h3 className="mt-5 text-white font-bold text-[28px] sm:text-[36px] leading-none">
+                        <h3 className="mt-5 text-white font-extrabold text-[28px] sm:text-[36px] leading-none">
                             Enter Raffle
                         </h3>
 
-                        <p className="mt-3 text-[#9FA8B7] text-[18px] sm:text-[22px] leading-tight">
+                        <p className="mt-3 text-[#9FA8B7] text-[17px] sm:text-[20px] leading-tight">
                             {raffle.title}
                         </p>
                     </div>
@@ -244,96 +275,128 @@ function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
                     <div
                         className="mt-6 rounded-[16px] p-4 sm:p-5"
                         style={{
-                            background: 'linear-gradient(90deg, rgba(82,48,18,0.65) 0%, rgba(53,34,18,0.65) 100%)',
+                            background: 'linear-gradient(90deg, rgba(95,56,20,0.52) 0%, rgba(59,39,20,0.52) 100%)',
                             border: '1px solid rgba(185,102,24,0.42)',
                         }}
                     >
-                        <div className="text-[#B6BDC9] text-[15px] sm:text-[17px] font-semibold">Prize</div>
-                        <div className="mt-3 text-white font-bold text-[18px] sm:text-[22px] leading-[1.25]">
+                        <div className="text-[#BFC5D1] text-[14px] sm:text-[16px] font-semibold">
+                            Prize
+                        </div>
+                        <div className="mt-3 text-white font-bold text-[17px] sm:text-[20px] leading-[1.35]">
                             {raffle.subtitle}
                         </div>
                     </div>
 
                     <div className="mt-6">
-                        <label className="block text-white font-bold text-[18px] sm:text-[20px] mb-3">
+                        <label className="block text-white font-bold text-[16px] sm:text-[18px] mb-2.5">
                             Full Name
                         </label>
                         <input
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            className="w-full h-[58px] sm:h-[64px] rounded-[16px] px-5 text-[20px] sm:text-[22px] text-white placeholder:text-[#8E96A4] outline-none"
+                            placeholder="Full Name"
+                            className="w-full h-[56px] sm:h-[60px] rounded-[14px] px-4 sm:px-5 text-[17px] sm:text-[19px] text-white placeholder:text-[#8E96A4] outline-none"
                             style={{
                                 background: '#050608',
                                 border: '1px solid rgba(77,102,143,0.7)',
                             }}
-                            placeholder="Full Name"
                         />
                     </div>
 
                     <div className="mt-4">
-                        <label className="block text-white font-bold text-[18px] sm:text-[20px] mb-3">
+                        <label className="block text-white font-bold text-[16px] sm:text-[18px] mb-2.5">
                             Email Address
                         </label>
                         <input
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full h-[58px] sm:h-[64px] rounded-[16px] px-5 text-[20px] sm:text-[22px] text-white placeholder:text-[#8E96A4] outline-none"
+                            placeholder="Email"
+                            className="w-full h-[56px] sm:h-[60px] rounded-[14px] px-4 sm:px-5 text-[17px] sm:text-[19px] text-white placeholder:text-[#8E96A4] outline-none"
                             style={{
                                 background: '#050608',
                                 border: '1px solid rgba(77,102,143,0.7)',
                             }}
-                            placeholder="Email Address"
                         />
                     </div>
 
-                    <div className="mt-4">
-                        <label className="block text-white font-bold text-[18px] sm:text-[20px] mb-3">
-                            Number of Tickets
+                    <div className="mt-6">
+                        <label className="block text-white font-bold text-[16px] sm:text-[18px] mb-3">
+                            Choose Your Ticket Bundle
                         </label>
 
-                        <div className="grid grid-cols-[58px_1fr_58px] sm:grid-cols-[64px_1fr_64px] gap-3 items-center">
-                            <button
-                                type="button"
-                                onClick={dec}
-                                className="h-[58px] sm:h-[64px] rounded-[14px] flex items-center justify-center text-white"
-                                style={{
-                                    background: '#050608',
-                                    border: '1px solid rgba(77,102,143,0.7)',
-                                }}
-                            >
-                                <Minus className="w-5 h-5 sm:w-6 sm:h-6" />
-                            </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {validPackages.map((pkg, index) => {
+                                const active = selectedPackage?.id === pkg.id;
+                                const packagePerTicket =
+                                    pkg.tickets > 0 && pkg.price > 0
+                                        ? (pkg.price / pkg.tickets).toFixed(2)
+                                        : null;
 
-                            <div
-                                className="h-[58px] sm:h-[64px] rounded-[14px] flex items-center justify-center text-white font-bold text-[24px] sm:text-[28px]"
-                                style={{
-                                    background: '#050608',
-                                    border: '1px solid rgba(77,102,143,0.7)',
-                                }}
-                            >
-                                {safeCount}
-                            </div>
+                                return (
+                                    <button
+                                        key={pkg.id || index}
+                                        type="button"
+                                        onClick={() => setSelectedPackageId(pkg.id)}
+                                        className="relative w-full rounded-[18px] p-4 sm:p-5 text-center transition-all duration-300"
+                                        style={{
+                                            background: active
+                                                ? 'linear-gradient(180deg, rgba(76,58,22,0.92) 0%, rgba(58,44,18,0.92) 100%)'
+                                                : 'linear-gradient(180deg, rgba(34,47,71,0.88) 0%, rgba(30,42,63,0.88) 100%)',
+                                            border: active
+                                                ? '2px solid #F3BF17'
+                                                : '1px solid rgba(77,102,143,0.55)',
+                                            boxShadow: active
+                                                ? '0 0 24px rgba(243,191,23,0.16)'
+                                                : 'none',
+                                            minHeight: '180px',
+                                        }}
+                                    >
+                                        {!!pkg.badge && (
+                                            <div
+                                                className="absolute left-1/2 -translate-x-1/2 top-[-11px] px-3 py-1 rounded-full text-[11px] sm:text-[12px] font-extrabold"
+                                                style={{
+                                                    background: '#F3BF17',
+                                                    color: '#111111',
+                                                    letterSpacing: '0.3px',
+                                                }}
+                                            >
+                                                {pkg.badge}
+                                            </div>
+                                        )}
 
-                            <button
-                                type="button"
-                                onClick={inc}
-                                className="h-[58px] sm:h-[64px] rounded-[14px] flex items-center justify-center text-white"
-                                style={{
-                                    background: '#050608',
-                                    border: '1px solid rgba(77,102,143,0.7)',
-                                }}
-                            >
-                                <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
-                            </button>
+                                        <div
+                                            className="mx-auto w-[48px] h-[48px] rounded-full flex items-center justify-center"
+                                            style={{
+                                                background: active
+                                                    ? 'rgba(243,191,23,1)'
+                                                    : 'rgba(255,255,255,0.10)',
+                                            }}
+                                        >
+                                            <Ticket
+                                                className={`w-5 h-5 ${active ? 'text-[#111]' : 'text-[#B0B7C3]'}`}
+                                                fill={active ? '#111111' : 'none'}
+                                            />
+                                        </div>
+
+                                        <div className={`mt-4 font-extrabold text-[28px] sm:text-[32px] leading-none ${active ? 'text-[#F3BF17]' : 'text-white'}`}>
+                                            £{pkg.price}
+                                        </div>
+
+                                        <div className={`mt-4 font-bold text-[17px] sm:text-[18px] ${active ? 'text-[#F3BF17]' : 'text-white'}`}>
+                                            {pkg.tickets} Ticket{pkg.tickets > 1 ? 's' : ''}
+                                        </div>
+
+                                        <div className="mt-2.5 text-[13px] sm:text-[14px] text-[#8F98A8]">
+                                            {packagePerTicket ? `£${packagePerTicket} each` : 'Package price'}
+                                        </div>
+                                    </button>
+                                );
+                            })}
                         </div>
-
-                        <p className="mt-2 text-[#9FA8B7] text-[14px] sm:text-[16px]">
-                            Maximum {maxTickets} tickets available
-                        </p>
                     </div>
 
                     <div
-                        className="mt-5 rounded-[16px] p-4 sm:p-5"
+                        className="mt-6 rounded-[16px] p-4 sm:p-5"
                         style={{
                             background: '#050608',
                             border: '1px solid rgba(77,102,143,0.7)',
@@ -341,37 +404,49 @@ function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
                     >
                         <div className="flex items-start justify-between gap-4">
                             <div>
-                                <div className="text-[#A0A8B7] text-[18px] sm:text-[20px]">Ticket Price</div>
-                                <div className="mt-3 text-[#A0A8B7] text-[18px] sm:text-[20px]">Quantity</div>
+                                <div className="text-[#A0A8B7] text-[16px] sm:text-[18px]">
+                                    Tickets
+                                </div>
+                                <div className="mt-5 text-[#A0A8B7] text-[16px] sm:text-[18px]">
+                                    Price per ticket
+                                </div>
                             </div>
 
                             <div className="text-right">
-                                <div className="text-white font-bold text-[18px] sm:text-[20px]">£{raffle.ticketPrice}</div>
-                                <div className="mt-3 text-white font-bold text-[18px] sm:text-[20px]">×{safeCount}</div>
+                                <div className="text-white font-bold text-[16px] sm:text-[18px]">
+                                    {ticketCount} {ticketCount === 1 ? 'ticket' : 'tickets'}
+                                </div>
+                                <div className="mt-5 text-white font-bold text-[16px] sm:text-[18px]">
+                                    {perTicket ? `£${perTicket} each` : '—'}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="my-4 h-px bg-[#43506B]" />
+                        <div className="my-5 h-px bg-[#43506B]" />
 
                         <div className="flex items-center justify-between gap-4">
-                            <div className="text-white font-bold text-[22px] sm:text-[26px]">Total Cost</div>
-                            <div className="text-[#F3BF17] font-extrabold text-[30px] sm:text-[36px]">£{totalCost}</div>
+                            <div className="text-white font-extrabold text-[22px] sm:text-[24px]">
+                                Total Cost
+                            </div>
+                            <div className="text-[#F3BF17] font-extrabold text-[34px] sm:text-[42px] leading-none">
+                                £{totalCost}
+                            </div>
                         </div>
                     </div>
 
                     <div
-                        className="mt-5 rounded-[16px] p-4 sm:p-5"
+                        className="mt-4 rounded-[16px] p-4 sm:p-5"
                         style={{
                             background: '#050608',
                             border: '1px solid rgba(77,102,143,0.7)',
                         }}
                     >
-                        <div className="flex items-center gap-3 text-[#A0A8B7] text-[16px] sm:text-[18px]">
+                        <div className="flex items-center gap-3 text-[#A0A8B7] text-[15px] sm:text-[16px]">
                             <CreditCard className="w-5 h-5" />
                             <span>Payment Method: Stripe</span>
                         </div>
 
-                        <div className="mt-3 flex items-center gap-3 text-[#A0A8B7] text-[16px] sm:text-[18px]">
+                        <div className="mt-3 flex items-center gap-3 text-[#A0A8B7] text-[15px] sm:text-[16px]">
                             <ShieldCheck className="w-5 h-5" />
                             <span>Secure & encrypted payment</span>
                         </div>
@@ -379,22 +454,26 @@ function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
 
                     <div className="mt-5">
                         <Button
-                            disabled={closed || entering || !fullName || !email}
+                            disabled={closed || entering || !fullName || !email || !selectedPackage}
                             onClick={async () => {
                                 const ok = await onConfirm?.({
                                     fullName,
                                     email,
-                                    ticketCount: safeCount,
-                                    totalCost,
+                                    ticketCount: Number(selectedPackage?.tickets || 0),
+                                    totalCost: Number(selectedPackage?.price || 0),
+                                    packageId: selectedPackage?.id || '',
+                                    packageBadge: selectedPackage?.badge || '',
+                                    packagePrice: Number(selectedPackage?.price || 0),
+                                    packageTickets: Number(selectedPackage?.tickets || 0),
                                 });
 
                                 if (!ok) {
                                     alert("Failed to enter raffle");
                                 }
                             }}
-                            className="bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-bold text-lg h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3 w-full justify-center !h-[60px] sm:!h-[66px] !text-[18px] sm:!text-[20px]"
+                            className="bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-extrabold rounded-[14px] shadow-[0_0_20px_rgba(229,151,12,0.26)] flex items-center gap-3 w-full justify-center !h-[58px] sm:!h-[64px] !text-[18px] sm:!text-[20px]"
                         >
-                            <Ticket className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <Ticket className="h-5 w-5 sm:h-5 sm:w-5" />
                             {closed ? 'Raffle Closed' : entering ? 'Processing...' : 'Pay & Enter Raffle'}
                         </Button>
                     </div>
@@ -722,24 +801,18 @@ const RafflesSection = () => {
 
             setEntering(true);
 
-            const newRef = push(ref(db, `raffle_entries/${raffle.id}`));
+            const response = await fetch(
+                `https://app-p4r2la7ira-uc.a.run.app/create-raffle-checkout-session?amount=${encodeURIComponent(payload.totalCost)}&email=${encodeURIComponent(payload.email)}&fullName=${encodeURIComponent(payload.fullName)}&raffleId=${encodeURIComponent(raffle.id)}&raffleTitle=${encodeURIComponent(raffle.title || "")}&rafflePrize=${encodeURIComponent(raffle.subtitle || "")}&packageId=${encodeURIComponent(payload.packageId || "")}&packageBadge=${encodeURIComponent(payload.packageBadge || "")}&packageTickets=${encodeURIComponent(payload.packageTickets || payload.ticketCount || 0)}`
+            );
 
-            await set(newRef, {
-                name: payload.fullName,
-                email: payload.email,
-                tickets: Number(payload.ticketCount || 1),
-                totalPaid: Number(payload.totalCost || 0),
-                signUpDate: new Date().toISOString(),
-                entryDate: new Date().toISOString(),
-                createdAt: Date.now(),
-            });
+            const data = await response.json();
 
-            await updateDoc(doc(firestore_db, "raffles", String(raffle.id)), {
-                sold: increment(Number(payload.ticketCount || 1)),
-            });
+            if (data?.url) {
+                window.location.href = data.url;
+                return true;
+            }
 
-            setSelectedRaffle(null);
-            return true;
+            return false;
         } catch (e) {
             console.log(e);
             return false;
