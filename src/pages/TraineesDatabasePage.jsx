@@ -31,18 +31,35 @@ function useOnClickOutside(ref, handler) {
 }
 
 const TraineeCard = ({ trainee }) => {
+
+    const safeLocation =
+        trainee.Region === undefined ||
+            trainee.Region === null ||
+            decrypt(trainee.Region) === undefined ||
+            decrypt(trainee.Region) === null ||
+            String(decrypt(trainee.Region)).trim() === ""
+            ? "Not provided"
+            : decrypt(trainee.Region);
+
+    const safeExperience =
+        trainee.Experience === undefined ||
+            trainee.Experience === null ||
+            String(trainee.Experience).trim() === ""
+            ? "Not provided"
+            : trainee.Experience;
+
     return (
         <div className="bg-[#111] border border-white/10 rounded-xl p-6 hover:border-[#FAB614]/50 transition-colors duration-300">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
                     <img
-                        src={trainee.Image==undefined?blackLogo:trainee.Image}
-                        alt={decrypt(trainee.First_Name)+' '+decrypt(trainee.Last_Name)}
+                        src={trainee.Image == undefined ? blackLogo : trainee.Image}
+                        alt={decrypt(trainee.First_Name) + ' ' + decrypt(trainee.Last_Name)}
                         className="w-16 h-16 rounded-full object-cover border-2 border-[#FAB614]/20"
                     />
                     <div>
-                        <h3 className="text-lg font-bold text-white">{decrypt(trainee.First_Name)+' '+decrypt(trainee.Last_Name)}</h3>
+                        <h3 className="text-lg font-bold text-white">{decrypt(trainee.First_Name) + ' ' + decrypt(trainee.Last_Name)}</h3>
                         <p className="text-[#FAB614] text-sm font-medium">{decrypt(trainee.Role)}</p>
                     </div>
                 </div>
@@ -58,12 +75,12 @@ const TraineeCard = ({ trainee }) => {
             <div className="mb-4">
                 <div className="flex justify-between text-xs text-gray-400 mb-2">
                     <span>Progress</span>
-                    <span>{Number(trainee.overall_progress*100).toFixed(2)}%</span>
+                    <span>{Number(trainee.overall_progress * 100).toFixed(2)}%</span>
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2">
                     <div
                         className="bg-[#FAB614] h-2 rounded-full"
-                        style={{ width: `${Number(trainee.overall_progress*100).toFixed(2)}%` }}
+                        style={{ width: `${Number(trainee.overall_progress * 100).toFixed(2)}%` }}
                     ></div>
                 </div>
             </div>
@@ -80,18 +97,18 @@ const TraineeCard = ({ trainee }) => {
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Location</span>
-                    <span className="text-white ">{decrypt(trainee.Region)}</span>
+                    <span className="text-white ">{safeLocation}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Experience</span>
-                    <span className="text-white ">{trainee.Experience}</span>
+                    <span className="text-white ">{safeExperience}</span>
                 </div>
             </div>
 
             {/* Action Button - Matches Screenshot (Outlined Gold) */}
             <Link
                 to="/profile"
-                state={{ user:trainee }}
+                state={{ user: trainee }}
                 className="block w-full text-center py-3 rounded-lg border border-[#FAB614]/40 text-[#FAB614] bg-[#FAB614]/5 font-semibold hover:bg-[#FAB614] hover:text-black transition-all duration-300"
             >
                 View Full Profile
@@ -129,12 +146,12 @@ const TraineeDatabasePage = () => {
             }
             setTrainees([...temp])
         }
-        catch(e){
-            console.log('Error ',e)
+        catch (e) {
+            console.log('Error ', e)
         }
     }
 
-    console.log('all trainees ...', trainees)
+    //console.log('all trainees ...', trainees)
 
     useEffect(() => {
         getAllTrainees()
@@ -162,6 +179,8 @@ const TraineeDatabasePage = () => {
     const [select_locations, setSelectLocations] = useState(Array(locations.length).fill(false))
     const [days, setDays] = useState(false)
     const [select, setSelect] = useState(false)
+
+    const [highest, setHighest] = useState(false)
 
     function markselected(i) {
         let temp = [...select_locations]
@@ -300,6 +319,19 @@ const TraineeDatabasePage = () => {
 
         }
 
+        if (highest) {
+            temp = [...trainees]
+            for (let i = 0; i < temp.length; i++) {
+                temp[i].overall_progress = temp[i].overall_progress == undefined ? 0 : temp[i].overall_progress
+                // temp[i].fav = isFavourite(temp[i].id)
+            }
+            temp.sort((a, b) => b.overall_progress - a.overall_progress);
+            if (searchText != '') {
+                temp = getSearchResult(temp, searchText)
+            }
+        }
+
+
         // location 
         let ticked = []
         for (let i = 0; i < select_locations.length; i++) {
@@ -342,7 +374,7 @@ const TraineeDatabasePage = () => {
         }
 
         setShowTrainees([...res1])
-    }, [days, trainees, searchText, select_locations, select_types])
+    }, [days, trainees, searchText, select_locations, select_types, highest])
 
 
     return (
@@ -409,6 +441,19 @@ const TraineeDatabasePage = () => {
                         >
                             <Clock size={16} />
                             <span>A-Z</span>
+                        </button>
+
+
+                        <button
+                            onClick={() => setHighest(!highest)}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1A1A1A] border transition-colors text-sm font-medium
+    ${highest
+                                    ? "border-[#FAB614] text-[#FAB614]"
+                                    : "border-white/10 text-gray-300 hover:border-[#FAB614]/50"
+                                }
+  `}
+                        >
+                            <span>Highest %</span>
                         </button>
 
 
@@ -488,7 +533,7 @@ const TraineeDatabasePage = () => {
             </div>
 
             {/* Pagination Section */}
-          
+
 
             <Footer />
         </div>

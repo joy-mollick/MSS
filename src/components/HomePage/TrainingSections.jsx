@@ -74,7 +74,7 @@ const TrainingSections = () => {
         <>
             {/* The CineCertified App */}
             <section className="relative z-10 container mx-auto px-6 py-16">
-                <div className="max-w-7xl mx-auto">
+                <div  className="max-w-7xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold uppercase text-[#FAB614] mb-4">
                             The CineCertified App
@@ -100,7 +100,7 @@ const TrainingSections = () => {
                         ))}
                     </div>
 
-                    <div className="flex justify-center gap-6">
+                    <div id='FirstAid' className="flex justify-center gap-6">
                         <div className="w-40 flex items-center justify-center">
                             <a href="https://apps.apple.com/gb/app/cinecertified/id6754809670" target="_blank" rel="noopener noreferrer"><img src={appstore} alt="Apple App Store" /></a>
                         </div>
@@ -112,9 +112,9 @@ const TrainingSections = () => {
             </section>
 
             {/* First Aid Training */}
-            <section className="relative z-10 ">
+            <section  className="relative z-10 ">
                 <div className=" overflow-hidden relative" style={{ backgroundImage: `url(${firstAid})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                    <div id='FirstAid' className="container mx-auto px-6 py-22 max-w-7xl relative z-10  flex flex-col items-center gap-8 text-center">
+                    <div  className="container mx-auto px-6 py-22 max-w-7xl relative z-10  flex flex-col items-center gap-8 text-center">
                         <h2 className="text-4xl md:text-5xl font-bold uppercase text-[#FAB614]">
                             First Aid Training For All Film Professionals
                         </h2>

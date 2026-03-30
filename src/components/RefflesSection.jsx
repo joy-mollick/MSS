@@ -282,7 +282,10 @@ function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
                         <div className="text-[#BFC5D1] text-[14px] sm:text-[16px] font-semibold">
                             Prize
                         </div>
-                        <div className="mt-3 text-white font-bold text-[17px] sm:text-[20px] leading-[1.35]">
+                        <div
+                            className="mt-3 text-white font-bold text-[17px] sm:text-[20px] leading-[1.35]"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
                             {raffle.subtitle}
                         </div>
                     </div>
@@ -487,6 +490,8 @@ function FeaturedRaffleCard({ raffle, onEnter }) {
     const progress = getProgress(raffle.soldTickets, raffle.totalTickets);
     const left = Math.max(raffle.totalTickets - raffle.soldTickets, 0);
 
+    console.log('Raffle big ....', raffle.image);
+
     return (
         <div
             className="relative overflow-hidden rounded-[24px] border"
@@ -499,7 +504,8 @@ function FeaturedRaffleCard({ raffle, onEnter }) {
             <div
                 className="absolute inset-0"
                 style={{
-                    backgroundImage: `url(${raffle.image})`,
+                    //  backgroundImage: `url(${raffle.image})`,
+                    backgroundImage: raffle?.image ? `url("${raffle.image}")` : 'none',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     opacity: 0.42,
@@ -545,7 +551,10 @@ function FeaturedRaffleCard({ raffle, onEnter }) {
 
                                 <div>
                                     <div className="text-[#F2BD16] text-[11px] sm:text-[12px] font-bold mb-1">Prize</div>
-                                    <div className="text-white text-[15px] sm:text-[18px] font-medium leading-snug">
+                                    <div
+                                        className="text-white text-[15px] sm:text-[18px] font-medium leading-snug"
+                                        style={{ whiteSpace: 'pre-line' }}
+                                    >
                                         {raffle.subtitle}
                                     </div>
                                 </div>
@@ -607,7 +616,7 @@ function SmallRaffleCard({ raffle, onEnter }) {
                 <div
                     className="absolute inset-0"
                     style={{
-                        backgroundImage: `url(${raffle.image})`,
+                        backgroundImage: raffle?.image ? `url("${raffle.image}")` : 'none',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         filter: closed ? 'grayscale(20%)' : 'none',
@@ -653,7 +662,12 @@ function SmallRaffleCard({ raffle, onEnter }) {
 
                         <div>
                             <div className="text-[#F2BD16] text-[11px] font-bold mb-1">Prize</div>
-                            <div className="text-white text-[14px] sm:text-[15px] leading-snug">{raffle.subtitle}</div>
+                            <div
+                                className="text-white text-[14px] sm:text-[15px] leading-snug"
+                                style={{ whiteSpace: 'pre-line' }}
+                            >
+                                {raffle.subtitle}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -754,6 +768,7 @@ const RafflesSection = () => {
         return () => off(entriesRef, "value", callback);
     }, []);
 
+
     const rafflesWithEntries = useMemo(() => {
         return raffles.map((item) => {
             const rawEntries = entriesMap?.[item.id] ? Object.values(entriesMap[item.id]) : [];
@@ -774,6 +789,8 @@ const RafflesSection = () => {
             };
         });
     }, [raffles, entriesMap]);
+
+    console.log('Raffles ....', rafflesWithEntries);
 
     const featuredRaffle = useMemo(() => {
         const upcoming = rafflesWithEntries
@@ -837,11 +854,9 @@ const RafflesSection = () => {
 
                         <div className="max-w-5xl">
                             <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-                                <span className="font-bold">
-                                    Enter for a chance to win incredible prizes.
-                                </span>
+                                Support us further by entering our CineCertified Raffles for a chance to win incredible prizes sponsored
                                 <br />
-                                Every ticket supports world-class camera training across the UK.
+                                by our supporters. Every ticket directly supports our work and the community as a whole.
                             </p>
                         </div>
                     </div>

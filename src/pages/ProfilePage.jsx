@@ -140,7 +140,7 @@ const ProfilePage = () => {
         quote: "John has demonstrated exceptional understanding of camera systems and networking concepts. His attention to detail and problem-solving abilities make him a valuable asset to any production team. Highly recommend for sign-off."
       },
       {
-        name: "Sarah Jenkins", // Changed name slightly to simulate variety, though screenshot had duplicate
+        name: "Sarah Jenkins",
         role: "Focus Puller",
         quote: "John has demonstrated exceptional understanding of camera systems and networking concepts. His attention to detail and problem-solving abilities make him a valuable asset to any production team. Highly recommend for sign-off."
       }
@@ -158,7 +158,13 @@ const ProfilePage = () => {
       <div className="container mx-auto px-4 pt-32 pb-20 max-w-6xl">
 
         {/* TOP HEADER CARD */}
-        <div className="bg-[#111] border border-white/10 rounded-2xl p-8 mb-8">
+        <div
+          className="bg-[#111] rounded-2xl p-8 mb-8"
+          style={{
+            border: '1px solid rgba(250, 182, 20, 0.22)',
+            background: 'linear-gradient(90deg, rgba(17,17,17,0.96) 0%, rgba(27,27,29,0.96) 100%)'
+          }}
+        >
 
           {/* Back Link */}
           <Link to="/trainees" className="inline-flex items-center gap-2 text-white hover:text-[#FAB614] mb-8 transition-colors">
@@ -172,22 +178,29 @@ const ProfilePage = () => {
               <img
                 src={traineeProfile.avatar}
                 alt={traineeProfile.name}
-                className="w-32 h-32 rounded-full object-cover border-4 border-[#FAB614]/20"
+                className="w-32 h-32 rounded-full object-cover"
+                style={{
+                  border: '4px solid #FAB614'
+                }}
               />
             </div>
 
             {/* Main Info */}
             <div className="flex-grow w-full">
               <div className="mb-6">
-                <h1 className="text-4xl font-bold text-white mb-2">{traineeProfile.name}</h1>
-                <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                  <div className="flex items-center gap-1.5">
-                    <MapPin size={16} className="text-[#FAB614]" />
-                    <span>Location: <span className="text-white">{traineeProfile.location}</span></span>
+                <h1 className="text-4xl font-bold text-white mb-4">{traineeProfile.name}</h1>
+
+                <div className="flex flex-col gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-[#F3B313]" />
+                    <span className="text-[#F3B313]">Location:</span>
+                    <span className="text-white">{traineeProfile.location}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <Briefcase size={16} className="text-[#FAB614]" />
-                    <span>Experience: <span className="text-white">{traineeProfile.experience}</span></span>
+
+                  <div className="flex items-center gap-2">
+                    <Briefcase size={16} className="text-[#F3B313]" />
+                    <span className="text-[#F3B313]">Experience:</span>
+                    <span className="text-white">{traineeProfile.experience}</span>
                   </div>
                 </div>
               </div>
@@ -203,13 +216,13 @@ const ProfilePage = () => {
                     <span>Training Progress</span>
                     <span>{traineeProfile.trainingProgress}%</span>
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full">
+                  <div className="w-full h-2 bg-[#344055] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-[#FAB614] rounded-full"
                       style={{ width: `${traineeProfile.trainingProgress}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-400 mt-2">
                     Days Logged: {traineeProfile.loggedDays}/{traineeProfile.totalDaysRequired}
                   </p>
                 </div>
@@ -244,7 +257,13 @@ const ProfilePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
           {/* PERSONAL INFORMATION */}
-          <div className="bg-[#111] border border-white/10 rounded-2xl p-8 h-full">
+          <div
+            className="bg-[#111] rounded-2xl p-8 h-full"
+            style={{
+              border: '1px solid rgba(250, 182, 20, 0.22)',
+              background: 'linear-gradient(90deg, rgba(17,17,17,0.96) 0%, rgba(27,27,29,0.96) 100%)'
+            }}
+          >
             <h3 className="text-[#FAB614] font-bold text-lg mb-6">Personal Information</h3>
 
             <div className="space-y-6">
@@ -261,22 +280,33 @@ const ProfilePage = () => {
                 <span className="text-white font-medium">{traineeProfile.personalInfo.department}</span>
               </div>
 
-          
               <CvViewer
                 traineeProfile={traineeProfile}
                 cvUrl={traineeProfile.personalInfo.Cv}
               />
-
-
             </div>
           </div>
 
           {/* SKILLS DEVELOPMENT */}
-          <div className="bg-[#111] border border-white/10 rounded-2xl p-8 h-full">
+          <div
+            className="bg-[#111] rounded-2xl p-8 h-full"
+            style={{
+              border: '1px solid rgba(250, 182, 20, 0.22)',
+              background: 'linear-gradient(90deg, rgba(17,17,17,0.96) 0%, rgba(27,27,29,0.96) 100%)'
+            }}
+          >
             <h3 className="text-[#FAB614] font-bold text-lg mb-6">Skills Development</h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {traineeProfile.skills.map((skill, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-[#151515] border border-white/5 rounded-lg px-4 py-4">
+                <div
+                  key={idx}
+                  className="flex items-center justify-between rounded-xl px-5 py-5"
+                  style={{
+                    background: '#050505',
+                    border: '1px solid rgba(76, 98, 140, 0.55)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)'
+                  }}
+                >
                   <span className="text-white font-medium">{skill.name}</span>
                   {skill.completed && (
                     <CheckCircle2 size={20} className="text-[#FAB614]" />
@@ -288,14 +318,29 @@ const ProfilePage = () => {
 
         </div>
 
-
         {/* REFERENCES */}
-        <div className="bg-[#111] border border-white/10 rounded-2xl p-8 mb-12">
+        <div
+          className="bg-[#111] rounded-2xl p-8 mb-12"
+          style={{
+            border: '1px solid rgba(250, 182, 20, 0.22)',
+            background: 'linear-gradient(90deg, rgba(17,17,17,0.96) 0%, rgba(27,27,29,0.96) 100%)'
+          }}
+        >
           <h3 className="text-[#FAB614] font-bold text-lg mb-6">References</h3>
-          <div className="space-y-4">
+          <div className="space-y-6">
             {references.map((ref, idx) => (
-              <div key={idx} className="bg-[#151515] border border-white/5 rounded-xl p-6">
-                <h4 className="text-white font-bold mb-1">{ref.first + ' ' + ref.last}, <span className="text-gray-400 font-normal">{ref.role}</span></h4>
+              <div
+                key={idx}
+                className="rounded-xl p-6"
+                style={{
+                  background: '#050505',
+                  border: '1px solid rgba(76, 98, 140, 0.55)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)'
+                }}
+              >
+                <h4 className="text-white font-bold mb-2">
+                  {ref.first + ' ' + ref.last}, <span className="text-gray-400 font-normal">{ref.role}</span>
+                </h4>
                 <p className="text-gray-400 text-sm leading-relaxed italic">"{ref.reference}"</p>
               </div>
             ))}

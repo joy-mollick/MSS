@@ -184,10 +184,21 @@ const DonationPage = () => {
                                     MAKE A DIFFERENCE
                                 </h1>
 
-                                <p className="mt-5 sm:mt-6 text-[#AEB5C2] text-[15px] sm:text-[18px] md:text-[19px] leading-7 sm:leading-8 max-w-3xl mx-auto">
-                                    Your generous donation helps us continue providing exceptional
-                                    training and support to camera professionals across the UK.
-                                </p>
+
+                                <div className="mt-5 sm:mt-6 text-center text-[#AEB5C2] text-[15px] sm:text-[18px] md:text-[19px] leading-7 sm:leading-8 mx-auto">
+                                    <p className="block lg:hidden max-w-3xl mx-auto">
+                                        Your generous support enables us to continue championing UK freelance professionals while building a nationwide skills passport that supports both emerging and established talent.
+                                    </p>
+
+                                    <p className="hidden lg:block max-w-none mx-auto">
+                                        <span className="block whitespace-nowrap">
+                                            Your generous support enables us to continue championing UK freelance professionals while building a nationwide
+                                        </span>
+                                        <span className="block">
+                                            skills passport that supports both emerging and established talent.
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
                         </>
 
