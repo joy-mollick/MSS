@@ -1,21 +1,21 @@
-
-import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle2, Play } from "lucide-react";
-
 import icon from '@/assets/icon.png';
 import hero from '@/assets/hero.png';
-import { useState } from "react";
-import { VideoModal } from "../VideoModal";
+
+const ABOUT_POINTS = [
+  'Standardises nationwide training through an easy-to-use app',
+  'Uses the SODOTO method for stronger knowledge retention',
+  'Gives trainees a clear overview of progress with a manageable end goal',
+  'Provides ongoing support across the UK, including remote regions',
+  'Lifts industry safety training and standards',
+];
 
 // Hero and About Section Component
-const HeroSection = ({ }) => {
-
+const HeroSection = () => {
   return (
     <>
       {/* Hero Section */}
       <section className="mt-8 md:mt-16 relative z-10 container mx-auto px-6 pt-16 text-center">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-8">
-
           <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold leading-tight uppercase">
             <span className="text-[#FAB614] block md:inline">
               For Camera Crew,
@@ -34,33 +34,29 @@ const HeroSection = ({ }) => {
               Welcome to a new era of camera department training. More certainty, more consistency of standards, and more access to learning.
             </p>
           </div>
-
         </div>
       </section>
 
-
       {/* About Section */}
-
       <section
         id="about"
         className="relative z-10 container mx-auto px-6 pt-24 py-16"
       >
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-12">
-
           {/* IMAGE */}
           <div className="relative flex-shrink-0 w-full lg:w-[410px] lg:ml-auto flex justify-center lg:justify-start">
             <img
               src={hero}
               alt="Camera Crew"
               className="
-          rounded-2xl
-          w-[65%]
-          sm:w-[75%]
-          md:w-[85%]
-          lg:w-[483px]
-          h-auto
-          block
-        "
+                rounded-2xl
+                w-[65%]
+                sm:w-[75%]
+                md:w-[85%]
+                lg:w-[483px]
+                h-auto
+                block
+              "
             />
           </div>
 
@@ -76,15 +72,13 @@ const HeroSection = ({ }) => {
             </p>
 
             <div className="flex flex-col gap-4 mt-4">
-              {[
-                'Standardises nationwide training through an easy-to-use app',
-                'Uses the SODOTO method for stronger knowledge retention',
-                'Gives trainees a clear overview of progress with a manageable end goal',
-                'Provides ongoing support across the UK, including remote regions',
-                'Lifts industry safety training and standards',
-              ].map((text) => (
+              {ABOUT_POINTS.map((text) => (
                 <div key={text} className="flex items-start gap-3">
-                  <img src={icon} alt="Icon" className="w-8 h-8" />
+                  <img
+                    src={icon}
+                    alt="Icon"
+                    className="w-8 h-8"
+                  />
                   <p className="text-lg md:text-xl text-white/90">
                     {text}
                   </p>
@@ -92,13 +86,8 @@ const HeroSection = ({ }) => {
               ))}
             </div>
           </div>
-
         </div>
       </section>
-
-
-
-
     </>
   );
 };

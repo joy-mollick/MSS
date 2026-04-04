@@ -1,9 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Heart, Lock, ChevronDown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import RefflesSection from '@/components/RefflesSection'
+import RefflesSection from '@/components/RefflesSection';
 import Footer from '@/components/HomePage/Footer';
 import { toast } from 'wc-toast';
+
+const DONATION_OPTIONS = [
+    { label: '£10', value: '10' },
+    { label: '£20', value: '20' },
+    { label: '£30', value: '30' },
+    { label: '£40', value: '40' },
+    { label: '£50', value: '50' },
+    { label: '£100', value: '100' },
+    { label: '£500', value: '500' },
+    { label: '£1000', value: '1000' },
+    { label: 'Custom Amount', value: 'custom' },
+];
 
 const DonationPage = () => {
     const [showNewsletter] = useState(false);
@@ -15,48 +27,36 @@ const DonationPage = () => {
     const [donorName, setDonorName] = useState('');
     const [donorEmail, setDonorEmail] = useState('');
 
-    const donationOptions = [
-        { label: '£10', value: '10' },
-        { label: '£20', value: '20' },
-        { label: '£30', value: '30' },
-        { label: '£40', value: '40' },
-        { label: '£50', value: '50' },
-        { label: '£100', value: '100' },
-        { label: '£500', value: '500' },
-        { label: '£1000', value: '1000' },
-        { label: 'Custom Amount', value: 'custom' },
-    ];
-
     const selectedLabel = useMemo(() => {
-        const found = donationOptions.find((x) => x.value === selectedAmount);
+        const found = DONATION_OPTIONS.find((x) => x.value === selectedAmount);
         return found ? found.label : 'Select an amount';
     }, [selectedAmount]);
 
-    const finalAmount =
-        selectedAmount === 'custom'
+    const finalAmount = useMemo(() => {
+        return selectedAmount === 'custom'
             ? Number(customAmount || 0)
             : Number(selectedAmount || 0);
-
+    }, [selectedAmount, customAmount]);
 
     useEffect(() => {
-        const hash = window.location.hash || "";
-        const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+        const hash = window.location.hash || '';
+        const queryString = hash.includes('?') ? hash.split('?')[1] : '';
         const params = new URLSearchParams(queryString);
 
         const stripeSuccess =
-            params.get("success") === "true" ||
-            params.get("payment") === "success" ||
-            params.get("donation") === "success" ||
-            !!params.get("session_id");
+            params.get('success') === 'true' ||
+            params.get('payment') === 'success' ||
+            params.get('donation') === 'success' ||
+            !!params.get('session_id');
 
         if (stripeSuccess) {
-            setStep("thanks");
-            setDonorName(localStorage.getItem("donation_name") || "");
-            setDonorEmail(localStorage.getItem("donation_email") || "");
+            setStep('thanks');
+            setDonorName(localStorage.getItem('donation_name') || '');
+            setDonorEmail(localStorage.getItem('donation_email') || '');
         }
     }, []);
 
-    const handleDonate = () => {
+    const handleDonate = useCallback(() => {
         if (!finalAmount || finalAmount <= 0) {
             toast.error('Please select or enter an amount');
             return;
@@ -64,18 +64,26 @@ const DonationPage = () => {
 
         setAmountOpen(false);
         setStep('details');
-    };
+    }, [finalAmount]);
 
-    const handleAmountPick = (value) => {
+    const handleAmountPick = useCallback((value) => {
         setSelectedAmount(value);
         setAmountOpen(false);
 
         if (value !== 'custom') {
             setCustomAmount('');
         }
-    };
+    }, []);
 
-    const handleConfirmDonation = async () => {
+    const handleCustomAmountChange = useCallback((e) => {
+        const value = e.target.value;
+        setCustomAmount(value);
+
+        if (value !== '') setSelectedAmount('custom');
+        if (value === '') setSelectedAmount('');
+    }, []);
+
+    const handleConfirmDonation = useCallback(async () => {
         if (!donorName.trim()) {
             toast.error('Please enter your full name');
             return;
@@ -103,7 +111,11 @@ const DonationPage = () => {
             localStorage.setItem('donation_amount', String(finalAmount));
 
             const response = await fetch(
-                `https://app-p4r2la7ira-uc.a.run.app/create-donation-checkout-session?amount=${encodeURIComponent(finalAmount)}&email=${encodeURIComponent(donorEmail.trim())}&donorName=${encodeURIComponent(donorName.trim())}`
+                `https://app-p4r2la7ira-uc.a.run.app/create-donation-checkout-session?amount=${encodeURIComponent(
+                    finalAmount
+                )}&email=${encodeURIComponent(donorEmail.trim())}&donorName=${encodeURIComponent(
+                    donorName.trim()
+                )}`
             );
 
             const data = await response.json();
@@ -113,19 +125,23 @@ const DonationPage = () => {
             } else {
                 toast.error('Failed to create donation checkout session');
             }
-        } catch (error) {
-            console.log(error);
+        } catch {
             toast.error('Something went wrong');
         }
-    };
+    }, [donorEmail, donorName, finalAmount]);
+
+    const goBackToSelect = useCallback(() => {
+        setStep('select');
+    }, []);
 
     return (
         <>
             <wc-toast></wc-toast>
 
             <div
-                className={`min-h-screen bg-black text-white overflow-x-hidden ${showNewsletter ? 'h-screen overflow-hidden' : ''
-                    }`}
+                className={`min-h-screen bg-black text-white overflow-x-hidden ${
+                    showNewsletter ? 'h-screen overflow-hidden' : ''
+                }`}
             >
                 <div className="fixed inset-0 pointer-events-none overflow-hidden">
                     <div className="absolute top-0 right-0 w-[1000px] h-[450px] bg-[#E5970C]/20 blur-[100px] rounded-full" />
@@ -136,7 +152,6 @@ const DonationPage = () => {
                 <section className="relative z-10 container mx-auto px-4 sm:px-6 pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-20 mt-6 sm:mt-10">
                     <div className="max-w-5xl mx-auto">
                         <div style={{ height: 10, width: '90%' }} />
-
 
                         <>
                             <div className="flex justify-center mb-8 sm:mb-10 md:mb-12">
@@ -184,7 +199,6 @@ const DonationPage = () => {
                                     MAKE A DIFFERENCE
                                 </h1>
 
-
                                 <div className="mt-5 sm:mt-6 text-center text-[#AEB5C2] text-[15px] sm:text-[18px] md:text-[19px] leading-7 sm:leading-8 mx-auto">
                                     <p className="block lg:hidden max-w-3xl mx-auto">
                                         Your generous support enables us to continue championing UK freelance professionals while building a nationwide skills passport that supports both emerging and established talent.
@@ -202,9 +216,7 @@ const DonationPage = () => {
                             </div>
                         </>
 
-
                         <div className="mt-10 sm:mt-12">
-
                             <div
                                 className="mx-auto w-full max-w-[650px] rounded-[18px] border border-[#41506B] px-4 sm:px-5 md:px-6 py-4 sm:py-5"
                                 style={{
@@ -250,8 +262,9 @@ const DonationPage = () => {
                                                         }}
                                                     >
                                                         <ChevronDown
-                                                            className={`w-4 h-4 text-white transition-transform duration-300 ${amountOpen ? 'rotate-180' : ''
-                                                                }`}
+                                                            className={`w-4 h-4 text-white transition-transform duration-300 ${
+                                                                amountOpen ? 'rotate-180' : ''
+                                                            }`}
                                                         />
                                                     </div>
                                                 </div>
@@ -266,7 +279,7 @@ const DonationPage = () => {
                                                                 '0 24px 60px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.03)',
                                                         }}
                                                     >
-                                                        {donationOptions.map((item, idx) => {
+                                                        {DONATION_OPTIONS.map((item, idx) => {
                                                             const active = selectedAmount === item.value;
 
                                                             return (
@@ -331,11 +344,7 @@ const DonationPage = () => {
                                                     min="0"
                                                     placeholder="0"
                                                     value={customAmount}
-                                                    onChange={(e) => {
-                                                        setCustomAmount(e.target.value);
-                                                        if (e.target.value !== '') setSelectedAmount('custom');
-                                                        if (e.target.value === '') setSelectedAmount('');
-                                                    }}
+                                                    onChange={handleCustomAmountChange}
                                                     className="w-full bg-transparent text-white placeholder:text-[#9AA3B2] text-[16px] sm:text-[18px] outline-none"
                                                 />
                                             </div>
@@ -345,10 +354,11 @@ const DonationPage = () => {
                                             type="button"
                                             disabled={!finalAmount || finalAmount <= 0}
                                             onClick={handleDonate}
-                                            className={`w-full h-[54px] sm:h-[62px] rounded-[14px] text-[17px] sm:text-[19px] font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${finalAmount > 0
-                                                ? 'text-black hover:scale-[1.01]'
-                                                : 'bg-[#445168] text-[#8C93A3] cursor-not-allowed'
-                                                }`}
+                                            className={`w-full h-[54px] sm:h-[62px] rounded-[14px] text-[17px] sm:text-[19px] font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
+                                                finalAmount > 0
+                                                    ? 'text-black hover:scale-[1.01]'
+                                                    : 'bg-[#445168] text-[#8C93A3] cursor-not-allowed'
+                                            }`}
                                             style={{
                                                 background: finalAmount > 0 ? '#EBB400' : '#445168',
                                                 boxShadow:
@@ -435,7 +445,7 @@ const DonationPage = () => {
 
                                         <button
                                             type="button"
-                                            onClick={() => setStep('select')}
+                                            onClick={goBackToSelect}
                                             className="w-full mt-3 h-[50px] sm:h-[56px] rounded-[14px] border border-[#465774] text-white text-[15px] sm:text-[17px] font-medium transition-all duration-300 hover:bg-white/5"
                                         >
                                             Back
@@ -488,7 +498,7 @@ const DonationPage = () => {
 
                                         <button
                                             type="button"
-                                            onClick={() => setStep('select')}
+                                            onClick={goBackToSelect}
                                             className="mt-7 h-[50px] sm:h-[56px] px-6 rounded-[14px] border border-[#465774] text-white text-[15px] sm:text-[17px] font-medium transition-all duration-300 hover:bg-white/5"
                                         >
                                             Back to Donation

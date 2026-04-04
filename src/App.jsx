@@ -20,19 +20,16 @@ import FinalAssessment from './pages/FinalAssessment';
 
 function App() {
 
-  const [ready, setReady] = useState(false)
+  async function authing(){
+    await auth.signInWithEmailAndPassword('n.joy@boomsoftware.co.uk', '2103199j');
+  }
 
   useEffect(() => {
-    auth.signInWithEmailAndPassword('n.joy@boomsoftware.co.uk', '2103199j').then(() => {
-      setReady(true)
-    }).catch((e) => {
-      console.log('E ', e)
-    })
+   authing()
   }, [])
 
 
   return (
-    ready?<>
       <Router>
         <ScrollToTop />
         <Routes>
@@ -53,8 +50,9 @@ function App() {
            <Route path='*' element={<HomePage />} />
         </Routes>
       </Router>
-    </>:null
   )
 }
 
 export default App
+
+// 

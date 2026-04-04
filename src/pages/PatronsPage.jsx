@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/HomePage/Footer';
 
@@ -17,235 +17,234 @@ import logo12 from '@/assets/logos/logo12.png'; // Verve
 import logo13 from '@/assets/logos/logo13.png'; // Vision Artists
 import logo14 from '@/assets/logos/logo14.png'; // Zeiss
 
-import { Calendar, Globe } from "lucide-react";
+import { Calendar, Globe } from 'lucide-react';
 
-const PatronsPage = () => {
-  const patrons = [
-    { id: 1, logo: logo1, name: "ARRI Rental", website: "https://www.arrirental.com/en" },
-    { id: 2, logo: logo2, name: "Brownian Motion", website: "https://www.brownianmotion.co.uk/" },
-    { id: 3, logo: logo3, name: "Digital Orchard", website: "https://digitalorchardgroup.com/" },
-    { id: 5, logo: logo5, name: "Filmsticks", website: "https://www.filmsticks.co/?srsltid=AfmBOopBaXUpGrEt9jx5V7barYC3C5yIsZY6H0LUWdAUi_y6eujfzYcD" },
-    { id: 6, logo: logo6, name: "Fujifilm", website: "https://www.fujifilm.com/uk/en" },
-    { id: 7, logo: logo7, name: "No Drama", website: "https://no-drama.co.uk/" },
-    { id: 8, logo: logo8, name: "Panavision", website: "https://uk.panavision.com/" },
-    { id: 9, logo: logo9, name: "Red", website: "https://www.red.com/" },
-    { id: 10, logo: logo10, name: "Suz Cruz", website: "https://www.suzcruz.co.uk/" },
-    { id: 11, logo: logo11, name: "TLS", website: "https://www.truelens.co.uk/" },
-    { id: 12, logo: logo12, name: "Verve", website: "https://verve.film/" },
-    { id: 14, logo: logo14, name: "Zeiss", website: "https://www.zeiss.co.uk/corporate/home.html" },
-  ];
+const PATRONS = [
+  { id: 1, logo: logo1, name: 'ARRI Rental', website: 'https://www.arrirental.com/en' },
+  { id: 2, logo: logo2, name: 'Brownian Motion', website: 'https://www.brownianmotion.co.uk/' },
+  { id: 3, logo: logo3, name: 'Digital Orchard', website: 'https://digitalorchardgroup.com/' },
+  { id: 5, logo: logo5, name: 'Filmsticks', website: 'https://www.filmsticks.co/?srsltid=AfmBOopBaXUpGrEt9jx5V7barYC3C5yIsZY6H0LUWdAUi_y6eujfzYcD' },
+  { id: 6, logo: logo6, name: 'Fujifilm', website: 'https://www.fujifilm.com/uk/en' },
+  { id: 7, logo: logo7, name: 'No Drama', website: 'https://no-drama.co.uk/' },
+  { id: 8, logo: logo8, name: 'Panavision', website: 'https://uk.panavision.com/' },
+  { id: 9, logo: logo9, name: 'Red', website: 'https://www.red.com/' },
+  { id: 10, logo: logo10, name: 'Suz Cruz', website: 'https://www.suzcruz.co.uk/' },
+  { id: 11, logo: logo11, name: 'TLS', website: 'https://www.truelens.co.uk/' },
+  { id: 12, logo: logo12, name: 'Verve', website: 'https://verve.film/' },
+  { id: 14, logo: logo14, name: 'Zeiss', website: 'https://www.zeiss.co.uk/corporate/home.html' },
+];
 
-  const supporters = [
-    "ACO",
-    "All Set in West",
-    "Atlas Lens Co.",
-    "Bebob",
-    "Bectu Camera Branch",
-    "British Cinematographer",
-    "Bright Tangerine",
-    "Brownian Motion",
-    "CameraWorks",
-    "Case Design",
-    "CineAero",
-    "CineArk",
-    "CineArray",
-    "Cinelab Film & Digital",
-    "CineParts",
-    "Cooke Optics",
-    "CVP",
-    "Digital Orchard",
-    "Easyrig",
-    "Emmyland",
-    "Film Crew Apparel",
-    "FilmFix",
-    "Films@59",
-    "Filmsticks",
-    "Focus Canning",
-    "FocusBug",
-    "FOG Creative",
-    "FOMO Rentals / FOMO House",
-    "Forty One Thirty",
-    "Fujifilm UK",
-    "Future In Film",
-    "GBCT",
-    "Gravy Crew",
-    "Grip Factory Munich (GFM)",
-    "GTC",
-    "Hawk UK",
-    "Holdan",
-    "Holistic Grips",
-    "Hydra Distribution",
-    "IMIS",
-    "Irwin Cine",
-    "JGA",
-    "KitStart",
-    "Kodak",
-    "Leitz",
-    "London Commercial DITs",
-    "Mark Milsome Foundation",
-    "Marzano Films",
-    "MCX Films",
-    "Mission Digital",
-    "Mr. Helix",
-    "No Drama",
-    "Notorious DIT",
-    "One Stop Films",
-    "Optical Support",
-    "Orchard Crew",
-    "Panavision",
-    "Progressive Broadcast Hire",
-    "RATE",
-    "Rebel Colour",
-    "RED Digital Cinema",
-    "Rexy Gaming",
-    "RSVP",
-    "S+O Media",
-    "Samas Cases",
-    "Screen Sisters",
-    "Sea Star Rental",
-    "Second Reef",
-    "Shoot Blue",
-    "Somerset Film",
-    "SONY",
-    "Stuck in Film",
-    "Sunbelt Rentals",
-    "SuzCruz",
-    "T-Stop Aerials",
-    "Tentacle Sound",
-    "That's A Wrap (TAW)",
-    "The Helicopter Girls",
-    "The Grip Company (TGC)",
-    "The Underwater Company",
-    "TheCallSheet.co.uk",
-    "Tiffen Filters",
-    "True Lens Services (TLS)",
-    "VERVE.film",
-    "Vision Artists Diary Service",
-    "VMI",
-    "We Love Hue",
-    "Women Behind The Camera",
-    "ZEISS",
+const SUPPORTERS = [
+  'ACO',
+  'All Set in West',
+  'Atlas Lens Co.',
+  'Bebob',
+  'Bectu Camera Branch',
+  'British Cinematographer',
+  'Bright Tangerine',
+  'Brownian Motion',
+  'CameraWorks',
+  'Case Design',
+  'CineAero',
+  'CineArk',
+  'CineArray',
+  'Cinelab Film & Digital',
+  'CineParts',
+  'Cooke Optics',
+  'CVP',
+  'Digital Orchard',
+  'Easyrig',
+  'Emmyland',
+  'Film Crew Apparel',
+  'FilmFix',
+  'Films@59',
+  'Filmsticks',
+  'Focus Canning',
+  'FocusBug',
+  'FOG Creative',
+  'FOMO Rentals / FOMO House',
+  'Forty One Thirty',
+  'Fujifilm UK',
+  'Future In Film',
+  'GBCT',
+  'Gravy Crew',
+  'Grip Factory Munich (GFM)',
+  'GTC',
+  'Hawk UK',
+  'Holdan',
+  'Holistic Grips',
+  'Hydra Distribution',
+  'IMIS',
+  'Irwin Cine',
+  'JGA',
+  'KitStart',
+  'Kodak',
+  'Leitz',
+  'London Commercial DITs',
+  'Mark Milsome Foundation',
+  'Marzano Films',
+  'MCX Films',
+  'Mission Digital',
+  'Mr. Helix',
+  'No Drama',
+  'Notorious DIT',
+  'One Stop Films',
+  'Optical Support',
+  'Orchard Crew',
+  'Panavision',
+  'Progressive Broadcast Hire',
+  'RATE',
+  'Rebel Colour',
+  'RED Digital Cinema',
+  'Rexy Gaming',
+  'RSVP',
+  'S+O Media',
+  'Samas Cases',
+  'Screen Sisters',
+  'Sea Star Rental',
+  'Second Reef',
+  'Shoot Blue',
+  'Somerset Film',
+  'SONY',
+  'Stuck in Film',
+  'Sunbelt Rentals',
+  'SuzCruz',
+  'T-Stop Aerials',
+  'Tentacle Sound',
+  "That's A Wrap (TAW)",
+  'The Helicopter Girls',
+  'The Grip Company (TGC)',
+  'The Underwater Company',
+  'TheCallSheet.co.uk',
+  'Tiffen Filters',
+  'True Lens Services (TLS)',
+  'VERVE.film',
+  'Vision Artists Diary Service',
+  'VMI',
+  'We Love Hue',
+  'Women Behind The Camera',
+  'ZEISS',
+  '121 Diary',
+  '24-7 Drama',
+];
 
-    "121 Diary",
-    "24-7 Drama"
-  ]
-
+const PatronCard = memo(function PatronCard({ patron }) {
   return (
-    <>
-      <div className="min-h-screen bg-black text-white overflow-x-hidden">
-        {/* Background decoration */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-[1000px] h-[450px] bg-[#E5970C]/20 blur-[100px] rounded-full" />
+    <div className="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.33%-1.5rem)] lg:w-[calc(16.66%-1.5rem)] min-w-[200px] border border-[#FAB614] rounded-xl p-4 flex flex-col justify-between hover:bg-[#FAB614]/5 transition-colors duration-300">
+      <div className="h-24 flex items-center justify-center mb-6">
+        <img
+          src={patron.logo}
+          alt={patron.name}
+          className="max-h-full max-w-full object-contain"
+          draggable={false}
+        />
+      </div>
+
+      <div className="mt-auto space-y-3">
+        <div className="flex items-center justify-between text-[10px] text-[#FAB614]/80">
+          <div className="flex items-center gap-1">
+            <Calendar size={12} />
+            <span>Patron since 2025</span>
+          </div>
+
+          <span className="bg-[#FAB614]/20 px-2 py-0.5 rounded text-[#FAB614] border border-[#FAB614]/30">
+            Patron
+          </span>
         </div>
 
-        <Navbar selectedMenu="Patrons" />
-
-        {/* Our Patrons */}
-
-        <section className="bg-black py-20 w-full mt-12">
-          <div className="container mx-auto px-4">
-
-            {/* Section Heading */}
-            <h2 className="text-4xl md:text-5xl font-extrabold text-[#FAB614] text-center mb-16 uppercase tracking-wider">
-              Our Patrons
-            </h2>
-
-            {/* Patrons Grid - Using Flex wrap to center the last row automatically */}
-            <div className="flex flex-wrap justify-center gap-6 mb-16">
-              {patrons.map((patron) => (
-                <div
-                  key={patron.id}
-                  className="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.33%-1.5rem)] lg:w-[calc(16.66%-1.5rem)] min-w-[200px] border border-[#FAB614] rounded-xl p-4 flex flex-col justify-between hover:bg-[#FAB614]/5 transition-colors duration-300"
-                >
-                  {/* Logo Area */}
-                  <div className="h-24 flex items-center justify-center mb-6">
-                    <img
-                      src={patron.logo}
-                      alt={patron.name}
-                      className="max-h-full max-w-full object-contain "
-                    />
-                  </div>
-
-                  {/* Card Meta & Action */}
-                  <div className="mt-auto space-y-3">
-
-                    {/* Info Row */}
-                    <div className="flex items-center justify-between text-[10px] text-[#FAB614]/80">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={12} />
-                        <span>Patron since 2025</span>
-                      </div>
-                      <span className="bg-[#FAB614]/20 px-2 py-0.5 rounded text-[#FAB614] border border-[#FAB614]/30">
-                        Patron
-                      </span>
-                    </div>
-
-                    {/* Visit Website Button */}
-                    <a
-                      href={patron.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-[#FAB614] hover:bg-[#E5970C] text-black font-semibold text-xs py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                    >
-                      <Globe size={14} />
-                      Visit Website
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-
-        <section className="bg-black max-w-5xl md:max-w-6xl mx-auto py-4 w-full">
-          <div className="container mx-auto px-4">
-
-            {/* Header Section */}
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-[#FAB614] uppercase tracking-wider mb-6">
-                Our Supporters
-              </h2>
-              <p className="text-white/80 text-lg max-w-4xl mx-auto leading-relaxed">
-                CineCertified is an initiative representing the camera department in the UK film, television and advertising sectors, built with the support of a wide array of companies:
-              </p>
-            </div>
-
-            {/* Supporters Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {supporters.map((supporter, index) => {
-                const isLast = index === supporters.length - 1;
-                const singleItemLastRowLg = supporters.length % 5 === 1;
-                const singleItemLastRowMd = supporters.length % 3 === 1;
-                const singleItemLastRowSm = supporters.length % 2 === 1;
-
-                return (
-                  <div
-                    key={index}
-                    className={`group relative bg-[#1A1A1A] border border-[#FAB614]/30 rounded-lg p-4 flex items-center justify-center text-center h-16 hover:border-[#FAB614] hover:bg-[#FAB614]/10 transition-all duration-300 cursor-default
-          ${isLast && singleItemLastRowSm ? "col-start-1 col-end-3 justify-self-center w-full max-w-[300px]" : ""}
-          ${isLast && singleItemLastRowMd ? "md:col-start-2 md:col-end-3" : ""}
-          ${isLast && singleItemLastRowLg ? "lg:col-start-3 lg:col-end-4" : ""}
-        `}
-                  >
-                    <span className="text-white text-sm font-medium group-hover:text-[#FAB614] transition-colors">
-                      {supporter}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-         
-
-          </div>
-        </section>
-
-        <Footer />
+        <a
+          href={patron.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-[#FAB614] hover:bg-[#E5970C] text-black font-semibold text-xs py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+        >
+          <Globe size={14} />
+          Visit Website
+        </a>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+});
 
+const SupporterCard = memo(function SupporterCard({
+  supporter,
+  isLast,
+  singleItemLastRowLg,
+  singleItemLastRowMd,
+  singleItemLastRowSm,
+}) {
+  return (
+    <div
+      className={`group relative bg-[#1A1A1A] border border-[#FAB614]/30 rounded-lg p-4 flex items-center justify-center text-center h-16 hover:border-[#FAB614] hover:bg-[#FAB614]/10 transition-all duration-300 cursor-default
+        ${isLast && singleItemLastRowSm ? 'col-start-1 col-end-3 justify-self-center w-full max-w-[300px]' : ''}
+        ${isLast && singleItemLastRowMd ? 'md:col-start-2 md:col-end-3' : ''}
+        ${isLast && singleItemLastRowLg ? 'lg:col-start-3 lg:col-end-4' : ''}
+      `}
+    >
+      <span className="text-white text-sm font-medium group-hover:text-[#FAB614] transition-colors">
+        {supporter}
+      </span>
+    </div>
+  );
+});
 
-export default PatronsPage;
+const PatronsPage = () => {
+  const lastIndex = SUPPORTERS.length - 1;
+  const singleItemLastRowLg = SUPPORTERS.length % 5 === 1;
+  const singleItemLastRowMd = SUPPORTERS.length % 3 === 1;
+  const singleItemLastRowSm = SUPPORTERS.length % 2 === 1;
+
+  return (
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-[1000px] h-[450px] bg-[#E5970C]/20 blur-[100px] rounded-full" />
+      </div>
+
+      <Navbar selectedMenu="Patrons" />
+
+      <section className="bg-black py-20 w-full mt-12">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#FAB614] text-center mb-16 uppercase tracking-wider">
+            Our Patrons
+          </h2>
+
+          <div className="flex flex-wrap justify-center gap-6 mb-16">
+            {PATRONS.map((patron) => (
+              <PatronCard key={patron.id} patron={patron} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-black max-w-5xl md:max-w-6xl mx-auto py-4 w-full">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#FAB614] uppercase tracking-wider mb-6">
+              Our Supporters
+            </h2>
+            <p className="text-white/80 text-lg max-w-4xl mx-auto leading-relaxed">
+              CineCertified is an initiative representing the camera department in the UK film, television and advertising sectors, built with the support of a wide array of companies:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {SUPPORTERS.map((supporter, index) => (
+              <SupporterCard
+                key={supporter}
+                supporter={supporter}
+                isLast={index === lastIndex}
+                singleItemLastRowLg={singleItemLastRowLg}
+                singleItemLastRowMd={singleItemLastRowMd}
+                singleItemLastRowSm={singleItemLastRowSm}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default memo(PatronsPage);

@@ -1,4 +1,10 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, {
+    memo,
+    useMemo,
+    useState,
+    useEffect,
+    useCallback,
+} from 'react';
 import { Button } from "@/components/ui/button";
 import {
     Calendar,
@@ -7,87 +13,15 @@ import {
     ShieldCheck,
     Ticket,
     Trophy,
-    Minus,
-    Plus,
     X,
+    Image as ImageIcon,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
-import '../App.css'
-import { db, firestore as firestore_db } from '../config'
-import { collection, onSnapshot, doc, updateDoc, increment } from 'firebase/firestore';
-import { ref, onValue, off, push, set } from 'firebase/database';
-
-const demoRaffles = [
-    {
-        id: 1,
-        title: 'Professional Camera Package',
-        subtitle: 'Sony FX6 Full-Frame Cinema Camera + Sigma Art Lens Kit + Professional Accessories',
-        description:
-            'Win a premium cinema camera package built for professional filmmaking and high-end production.',
-        image:
-            'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1600&auto=format&fit=crop',
-        ticketPrice: 10,
-        totalTickets: 500,
-        soldTickets: 342,
-        drawDate: '2026-03-30T23:59:00',
-        status: 'active',
-    },
-    {
-        id: 2,
-        title: 'Film Production Masterclass',
-        subtitle: '3-Day Intensive Masterclass + Accommodation + Certificate Of Completion',
-        description:
-            'Exclusive 3-day masterclass with award-winning cinematography professionals and practical workshops.',
-        image:
-            'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop',
-        ticketPrice: 15,
-        totalTickets: 200,
-        soldTickets: 178,
-        drawDate: '2026-04-15T23:59:00',
-        status: 'active',
-    },
-    {
-        id: 3,
-        title: 'DJI Ronin 4D Cinema Camera',
-        subtitle: 'DJI Ronin 4D 8K Cinema Camera + Full Accessory Kit + 2TB Storage',
-        description:
-            'State-of-the-art all-in-one cinema camera system with integrated gimbal and LiDAR.',
-        image:
-            'https://images.unsplash.com/photo-1510127034890-ba27508e9f1c?q=80&w=1200&auto=format&fit=crop',
-        ticketPrice: 20,
-        totalTickets: 300,
-        soldTickets: 245,
-        drawDate: '2026-04-20T23:59:00',
-        status: 'active',
-    },
-    {
-        id: 4,
-        title: 'Lighting Equipment Bundle',
-        subtitle: 'ARRI SkyPanel S60-C + Aputure 600D Pro + Light Stands & Modifiers',
-        description:
-            'Complete professional lighting package for studio, location, film and TV production.',
-        image:
-            'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1200&auto=format&fit=crop',
-        ticketPrice: 10,
-        totalTickets: 400,
-        soldTickets: 400,
-        drawDate: '2026-02-28T23:59:00',
-        status: 'closed',
-    },
-    {
-        id: 5,
-        title: 'Wireless Focus System Pro Kit',
-        subtitle: 'Tilta Nucleus-M + Hand Unit + Motors + Full Assistant Camera Bundle',
-        description:
-            'Professional wireless focus control bundle built for demanding film and TV shoots.',
-        image:
-            'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop',
-        ticketPrice: 12,
-        totalTickets: 250,
-        soldTickets: 250,
-        drawDate: '2026-01-30T23:59:00',
-        status: 'closed',
-    },
-];
+import '../App.css';
+import { db, firestore as firestore_db } from '../config';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { ref, onValue, off } from 'firebase/database';
 
 function formatDate(dateStr) {
     const d = new Date(dateStr);
@@ -118,7 +52,30 @@ function isUpcoming(raffle) {
     return !isClosed(raffle);
 }
 
-function Badge({ children, type = 'default' }) {
+function normalizeRaffleImages(item) {
+    const raw = Array.isArray(item?.attachmentUrls) ? item.attachmentUrls : [];
+
+    const images = raw
+        .map((file) => {
+            if (typeof file === 'string') return file;
+
+            const type = String(file?.type || '').toLowerCase();
+            const url = file?.url || file?.downloadURL || file?.src || '';
+
+            if (url && type.includes('image')) return url;
+            return '';
+        })
+        .filter(Boolean);
+
+    const uniqueImages = [...new Set(images)];
+
+    if (uniqueImages.length > 0) return uniqueImages;
+    if (item?.image) return [item.image];
+
+    return [];
+}
+
+const Badge = memo(function Badge({ children, type = 'default' }) {
     const styleMap = {
         default: {
             background: 'rgba(255,255,255,0.06)',
@@ -150,9 +107,9 @@ function Badge({ children, type = 'default' }) {
             {children}
         </div>
     );
-}
+});
 
-function FeaturedStat({ label, value, highlight = false }) {
+const FeaturedStat = memo(function FeaturedStat({ label, value, highlight = false }) {
     return (
         <div
             className="rounded-[16px] px-4 py-3 sm:px-5 sm:py-4 min-h-[82px] flex flex-col justify-center"
@@ -168,9 +125,9 @@ function FeaturedStat({ label, value, highlight = false }) {
             </div>
         </div>
     );
-}
+});
 
-function ProgressBar({ value }) {
+const ProgressBar = memo(function ProgressBar({ value }) {
     return (
         <div className="w-full">
             <div className="flex items-center justify-between mb-2">
@@ -189,52 +146,279 @@ function ProgressBar({ value }) {
             </div>
         </div>
     );
-}
+});
 
-function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
+const ImageThumbStrip = memo(function ImageThumbStrip({ images = [], onOpen, compact = false }) {
+    if (!Array.isArray(images) || images.length === 0) return null;
+
+    return (
+        <div className="mt-5">
+            <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                    <div
+                        className="w-8 h-8 rounded-[10px] flex items-center justify-center"
+                        style={{ background: 'rgba(243,191,23,0.12)', border: '1px solid rgba(243,191,23,0.16)' }}
+                    >
+                        <ImageIcon className="w-4 h-4 text-[#F2BD16]" />
+                    </div>
+                    <div className="text-white font-semibold text-[14px] sm:text-[15px]">
+                        Gallery
+                    </div>
+                </div>
+
+                <div
+                    className="px-3 py-1 rounded-full text-[11px] sm:text-[12px] font-bold"
+                    style={{
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        color: '#D8DEE9',
+                    }}
+                >
+                    {images.length} image{images.length > 1 ? 's' : ''}
+                </div>
+            </div>
+
+            <div
+                className="flex gap-3 overflow-x-auto pb-2"
+                style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#E9A700 rgba(255,255,255,0.08)',
+                }}
+            >
+                {images.map((img, index) => (
+                    <button
+                        key={`${img}-${index}`}
+                        type="button"
+                        onClick={() => onOpen?.(images, index)}
+                        className="relative flex-shrink-0 overflow-hidden rounded-[14px] border cursor-pointer"
+                        style={{
+                            width: compact ? 74 : 88,
+                            height: compact ? 74 : 88,
+                            borderColor: 'rgba(255,255,255,0.12)',
+                            background: '#0F1013',
+                        }}
+                    >
+                        <img
+                            src={img}
+                            alt={`Raffle image ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            draggable={false}
+                        />
+                        <div
+                            className="absolute inset-0"
+                            style={{
+                                background: 'linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.22) 100%)',
+                            }}
+                        />
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+});
+
+const ImageLightboxModal = memo(function ImageLightboxModal({
+    images = [],
+    currentIndex = 0,
+    onClose,
+    onPrev,
+    onNext,
+    onSelect,
+}) {
+    if (!Array.isArray(images) || images.length === 0) return null;
+
+    const activeImage = images[currentIndex] || images[0];
+
+    return (
+        <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+            <div
+                className="relative w-full max-w-[1100px] rounded-[24px] border overflow-hidden"
+                style={{
+                    background: 'linear-gradient(180deg, rgba(20,20,22,0.98) 0%, rgba(12,12,14,0.98) 100%)',
+                    borderColor: 'rgba(255,255,255,0.08)',
+                    boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+                    maxHeight: 'calc(100vh - 24px)',
+                }}
+            >
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full flex items-center justify-center text-white hover:opacity-100 transition-opacity"
+                    style={{
+                        background: 'rgba(0,0,0,0.55)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                >
+                    <X className="w-5 h-5" />
+                </button>
+
+                {images.length > 1 && (
+                    <>
+                        <button
+                            onClick={onPrev}
+                            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full flex items-center justify-center text-white"
+                            style={{
+                                background: 'rgba(0,0,0,0.55)',
+                                border: '1px solid rgba(255,255,255,0.12)',
+                            }}
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+
+                        <button
+                            onClick={onNext}
+                            className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full flex items-center justify-center text-white"
+                            style={{
+                                background: 'rgba(0,0,0,0.55)',
+                                border: '1px solid rgba(255,255,255,0.12)',
+                            }}
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </>
+                )}
+
+                <div className="p-3 sm:p-4 md:p-5">
+                    <div
+                        className="w-full rounded-[18px] overflow-hidden flex items-center justify-center"
+                        style={{
+                            background: '#090A0C',
+                            minHeight: '58vh',
+                            maxHeight: '72vh',
+                        }}
+                    >
+                        <img
+                            src={activeImage}
+                            alt={`Raffle large preview ${currentIndex + 1}`}
+                            className="max-w-full max-h-[72vh] object-contain"
+                            draggable={false}
+                        />
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                        <div className="text-white font-semibold text-[14px] sm:text-[15px]">
+                            Image {currentIndex + 1} of {images.length}
+                        </div>
+
+                        <div className="text-[#9AA3B2] text-[13px] sm:text-[14px]">
+                            Click thumbnails below to switch
+                        </div>
+                    </div>
+
+                    {images.length > 1 && (
+                        <div
+                            className="mt-4 flex gap-3 overflow-x-auto pb-2"
+                            style={{
+                                scrollbarWidth: 'thin',
+                                scrollbarColor: '#E9A700 rgba(255,255,255,0.08)',
+                            }}
+                        >
+                            {images.map((img, index) => {
+                                const active = index === currentIndex;
+
+                                return (
+                                    <button
+                                        key={`${img}-${index}`}
+                                        type="button"
+                                        onClick={() => onSelect?.(index)}
+                                        className="relative flex-shrink-0 overflow-hidden rounded-[14px] border"
+                                        style={{
+                                            width: 82,
+                                            height: 82,
+                                            borderColor: active ? '#F2BD16' : 'rgba(255,255,255,0.12)',
+                                            boxShadow: active ? '0 0 0 2px rgba(242,189,22,0.18)' : 'none',
+                                            background: '#0F1013',
+                                        }}
+                                    >
+                                        <img
+                                            src={img}
+                                            alt={`Thumb ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                            draggable={false}
+                                        />
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+});
+
+const EnterRaffleModal = memo(function EnterRaffleModal({
+    raffle,
+    onClose,
+    onConfirm,
+    entering = false,
+}) {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
 
-    if (!raffle) return null;
+    const packageDeals = useMemo(() => {
+        if (!raffle) return [];
 
-    const closed = isClosed(raffle);
-    const maxTickets = Math.max((raffle?.totalTickets || 0) - (raffle?.soldTickets || 0), 0);
-
-    const packageDeals =
-        Array.isArray(raffle?.packageDeals) && raffle.packageDeals.length > 0
+        return Array.isArray(raffle?.packageDeals) && raffle.packageDeals.length > 0
             ? raffle.packageDeals
             : [
-                {
-                    id: 'default-package',
-                    tickets: 1,
-                    price: Number(raffle?.ticketPrice || 0),
-                    badge: '',
-                },
-            ];
+                  {
+                      id: 'default-package',
+                      tickets: 1,
+                      price: Number(raffle?.ticketPrice || 0),
+                      badge: '',
+                  },
+              ];
+    }, [raffle]);
 
-    const validPackages = packageDeals
-        .map((pkg, idx) => ({
-            id: pkg?.id || `pkg-${idx}`,
-            tickets: Number(pkg?.tickets || 0),
-            price: Number(pkg?.price || 0),
-            badge: pkg?.badge || '',
-        }))
-        .filter((pkg) => pkg.tickets > 0 && pkg.price > 0 && pkg.tickets <= Math.max(maxTickets, 0));
+    const maxTickets = useMemo(() => {
+        return raffle ? Math.max((raffle?.totalTickets || 0) - (raffle?.soldTickets || 0), 0) : 0;
+    }, [raffle]);
 
-    const initialSelected = validPackages[0]?.id || null;
-    const [selectedPackageId, setSelectedPackageId] = useState(initialSelected);
+    const validPackages = useMemo(() => {
+        return packageDeals
+            .map((pkg, idx) => ({
+                id: pkg?.id || `pkg-${idx}`,
+                tickets: Number(pkg?.tickets || 0),
+                price: Number(pkg?.price || 0),
+                badge: pkg?.badge || '',
+            }))
+            .filter((pkg) => pkg.tickets > 0 && pkg.price > 0 && pkg.tickets <= Math.max(maxTickets, 0));
+    }, [packageDeals, maxTickets]);
+
+    const [selectedPackageId, setSelectedPackageId] = useState(validPackages[0]?.id || null);
 
     useEffect(() => {
         setSelectedPackageId(validPackages[0]?.id || null);
-    }, [raffle?.id]);
+    }, [raffle?.id, validPackages]);
 
-    const selectedPackage =
-        validPackages.find((pkg) => pkg.id === selectedPackageId) || validPackages[0] || null;
+    const selectedPackage = useMemo(() => {
+        return validPackages.find((pkg) => pkg.id === selectedPackageId) || validPackages[0] || null;
+    }, [validPackages, selectedPackageId]);
 
     const totalCost = Number(selectedPackage?.price || 0);
     const ticketCount = Number(selectedPackage?.tickets || 0);
     const perTicket =
         ticketCount > 0 && totalCost > 0 ? (totalCost / ticketCount).toFixed(2) : null;
+    const closed = raffle ? isClosed(raffle) : false;
+
+    const handleConfirm = useCallback(async () => {
+        const ok = await onConfirm?.({
+            fullName,
+            email,
+            ticketCount: Number(selectedPackage?.tickets || 0),
+            totalCost: Number(selectedPackage?.price || 0),
+            packageId: selectedPackage?.id || '',
+            packageBadge: selectedPackage?.badge || '',
+            packagePrice: Number(selectedPackage?.price || 0),
+            packageTickets: Number(selectedPackage?.tickets || 0),
+        });
+
+        if (!ok) {
+            alert("Failed to enter raffle");
+        }
+    }, [email, fullName, onConfirm, selectedPackage]);
+
+    if (!raffle) return null;
 
     return (
         <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
@@ -458,22 +642,7 @@ function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
                     <div className="mt-5">
                         <Button
                             disabled={closed || entering || !fullName || !email || !selectedPackage}
-                            onClick={async () => {
-                                const ok = await onConfirm?.({
-                                    fullName,
-                                    email,
-                                    ticketCount: Number(selectedPackage?.tickets || 0),
-                                    totalCost: Number(selectedPackage?.price || 0),
-                                    packageId: selectedPackage?.id || '',
-                                    packageBadge: selectedPackage?.badge || '',
-                                    packagePrice: Number(selectedPackage?.price || 0),
-                                    packageTickets: Number(selectedPackage?.tickets || 0),
-                                });
-
-                                if (!ok) {
-                                    alert("Failed to enter raffle");
-                                }
-                            }}
+                            onClick={handleConfirm}
                             className="bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-extrabold rounded-[14px] shadow-[0_0_20px_rgba(229,151,12,0.26)] flex items-center gap-3 w-full justify-center !h-[58px] sm:!h-[64px] !text-[18px] sm:!text-[20px]"
                         >
                             <Ticket className="h-5 w-5 sm:h-5 sm:w-5" />
@@ -484,13 +653,11 @@ function EnterRaffleModal({ raffle, onClose, onConfirm, entering = false }) {
             </div>
         </div>
     );
-}
+});
 
-function FeaturedRaffleCard({ raffle, onEnter }) {
+const FeaturedRaffleCard = memo(function FeaturedRaffleCard({ raffle, onEnter, onOpenGallery }) {
     const progress = getProgress(raffle.soldTickets, raffle.totalTickets);
     const left = Math.max(raffle.totalTickets - raffle.soldTickets, 0);
-
-    console.log('Raffle big ....', raffle.image);
 
     return (
         <div
@@ -504,7 +671,6 @@ function FeaturedRaffleCard({ raffle, onEnter }) {
             <div
                 className="absolute inset-0"
                 style={{
-                    //  backgroundImage: `url(${raffle.image})`,
                     backgroundImage: raffle?.image ? `url("${raffle.image}")` : 'none',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
@@ -561,6 +727,11 @@ function FeaturedRaffleCard({ raffle, onEnter }) {
                             </div>
                         </div>
 
+                        <ImageThumbStrip
+                            images={raffle.images}
+                            onOpen={onOpenGallery}
+                        />
+
                         <div className="mt-7">
                             <Button
                                 onClick={() => onEnter(raffle)}
@@ -596,9 +767,9 @@ function FeaturedRaffleCard({ raffle, onEnter }) {
             </div>
         </div>
     );
-}
+});
 
-function SmallRaffleCard({ raffle, onEnter }) {
+const SmallRaffleCard = memo(function SmallRaffleCard({ raffle, onEnter, onOpenGallery }) {
     const progress = getProgress(raffle.soldTickets, raffle.totalTickets);
     const left = Math.max(raffle.totalTickets - raffle.soldTickets, 0);
     const closed = isClosed(raffle);
@@ -672,6 +843,12 @@ function SmallRaffleCard({ raffle, onEnter }) {
                     </div>
                 </div>
 
+                <ImageThumbStrip
+                    images={raffle.images}
+                    onOpen={onOpenGallery}
+                    compact
+                />
+
                 <div className="grid grid-cols-2 gap-3 mt-5">
                     <div
                         className="rounded-[14px] p-4"
@@ -716,8 +893,9 @@ function SmallRaffleCard({ raffle, onEnter }) {
                     <Button
                         onClick={() => !closed && onEnter(raffle)}
                         disabled={closed}
-                        className={`bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-bold text-lg h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3 w-full justify-center ${closed ? '!bg-[#1C2331] !text-[#677084] shadow-none cursor-not-allowed' : ''
-                            }`}
+                        className={`bg-gradient-to-r cursor-pointer from-[#FAB614] to-[#E5970C] text-black font-bold text-lg h-14 px-8 rounded-full shadow-[0_0_20px_rgba(229,151,12,0.3)] flex items-center gap-3 w-full justify-center ${
+                            closed ? '!bg-[#1C2331] !text-[#677084] shadow-none cursor-not-allowed' : ''
+                        }`}
                     >
                         <Calendar className="h-5 w-5" />
                         {closed ? 'Raffle Closed' : 'Enter Raffle'}
@@ -726,16 +904,17 @@ function SmallRaffleCard({ raffle, onEnter }) {
             </div>
         </div>
     );
-}
+});
 
 const RafflesSection = () => {
-
-
     const [selectedRaffle, setSelectedRaffle] = useState(null);
     const [raffles, setRaffles] = useState([]);
     const [entriesMap, setEntriesMap] = useState({});
     const [load, setLoad] = useState(true);
     const [entering, setEntering] = useState(false);
+
+    const [galleryImages, setGalleryImages] = useState([]);
+    const [galleryIndex, setGalleryIndex] = useState(0);
 
     useEffect(() => {
         const unsub = onSnapshot(collection(firestore_db, "raffles"), (snapshot) => {
@@ -768,19 +947,16 @@ const RafflesSection = () => {
         return () => off(entriesRef, "value", callback);
     }, []);
 
-
     const rafflesWithEntries = useMemo(() => {
         return raffles.map((item) => {
             const rawEntries = entriesMap?.[item.id] ? Object.values(entriesMap[item.id]) : [];
             const soldFromEntries = rawEntries.reduce((sum, entry) => sum + Number(entry.tickets || 0), 0);
+            const images = normalizeRaffleImages(item);
 
             return {
                 ...item,
-                image:
-                    Array.isArray(item.attachmentUrls) &&
-                        item.attachmentUrls.find((f) => String(f.type || "").includes("image"))?.url
-                        ? item.attachmentUrls.find((f) => String(f.type || "").includes("image"))?.url
-                        : item.image || "",
+                images,
+                image: images[0] || "",
                 ticketPrice: Number(item.price || 0),
                 totalTickets: Number(item.total || 0),
                 soldTickets: Number(item.sold ?? soldFromEntries ?? 0),
@@ -789,8 +965,6 @@ const RafflesSection = () => {
             };
         });
     }, [raffles, entriesMap]);
-
-    console.log('Raffles ....', rafflesWithEntries);
 
     const featuredRaffle = useMemo(() => {
         const upcoming = rafflesWithEntries
@@ -812,7 +986,32 @@ const RafflesSection = () => {
         });
     }, [rafflesWithEntries, featuredRaffle]);
 
-    async function submitRaffleEntry(raffle, payload) {
+    const openGallery = useCallback((images = [], index = 0) => {
+        if (!Array.isArray(images) || images.length === 0) return;
+        setGalleryImages(images);
+        setGalleryIndex(index);
+    }, []);
+
+    const closeGallery = useCallback(() => {
+        setGalleryImages([]);
+        setGalleryIndex(0);
+    }, []);
+
+    const showPrevImage = useCallback(() => {
+        setGalleryIndex((prev) => {
+            if (!galleryImages.length) return 0;
+            return prev === 0 ? galleryImages.length - 1 : prev - 1;
+        });
+    }, [galleryImages]);
+
+    const showNextImage = useCallback(() => {
+        setGalleryIndex((prev) => {
+            if (!galleryImages.length) return 0;
+            return prev === galleryImages.length - 1 ? 0 : prev + 1;
+        });
+    }, [galleryImages]);
+
+    const submitRaffleEntry = useCallback(async (raffle, payload) => {
         try {
             if (!raffle?.id) return false;
 
@@ -830,13 +1029,24 @@ const RafflesSection = () => {
             }
 
             return false;
-        } catch (e) {
-            console.log(e);
+        } catch {
             return false;
         } finally {
             setEntering(false);
         }
-    }
+    }, []);
+
+    const handleOpenEnterModal = useCallback((raffle) => {
+        setSelectedRaffle(raffle);
+    }, []);
+
+    const handleCloseEnterModal = useCallback(() => {
+        setSelectedRaffle(null);
+    }, []);
+
+    const handleGallerySelect = useCallback((index) => {
+        setGalleryIndex(index);
+    }, []);
 
     return (
         <>
@@ -866,7 +1076,11 @@ const RafflesSection = () => {
                     ) : null}
 
                     {!load && featuredRaffle && (
-                        <FeaturedRaffleCard raffle={featuredRaffle} onEnter={setSelectedRaffle} />
+                        <FeaturedRaffleCard
+                            raffle={featuredRaffle}
+                            onEnter={handleOpenEnterModal}
+                            onOpenGallery={openGallery}
+                        />
                     )}
 
                     {!load && otherRaffles.length > 0 && (
@@ -885,23 +1099,34 @@ const RafflesSection = () => {
                                     >
                                         <SmallRaffleCard
                                             raffle={raffle}
-                                            onEnter={setSelectedRaffle}
+                                            onEnter={handleOpenEnterModal}
+                                            onOpenGallery={openGallery}
                                         />
                                     </div>
                                 ))}
                             </div>
                         </div>
                     )}
-
                 </div>
             </section>
 
             {selectedRaffle && (
                 <EnterRaffleModal
                     raffle={selectedRaffle}
-                    onClose={() => setSelectedRaffle(null)}
+                    onClose={handleCloseEnterModal}
                     entering={entering}
                     onConfirm={(payload) => submitRaffleEntry(selectedRaffle, payload)}
+                />
+            )}
+
+            {galleryImages.length > 0 && (
+                <ImageLightboxModal
+                    images={galleryImages}
+                    currentIndex={galleryIndex}
+                    onClose={closeGallery}
+                    onPrev={showPrevImage}
+                    onNext={showNextImage}
+                    onSelect={handleGallerySelect}
                 />
             )}
         </>
