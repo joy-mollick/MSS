@@ -26,6 +26,8 @@ const ProfilePage = () => {
 
   const [references, setReferences] = useState([])
 
+  console.log('References ....',references)
+
   useEffect(() => {
     const subscribe = db.ref('Industry_ref').orderByChild('user_id').equalTo(user.id).on('value', (snapshot) => {
       if (snapshot != undefined && snapshot.val() != null) {
