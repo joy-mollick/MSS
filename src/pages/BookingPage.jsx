@@ -10,6 +10,7 @@ import {
   BookOpen,
   Lock,
   Loader2,
+  Building2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -334,7 +335,7 @@ const BookingPage = () => {
   const renderStep1 = () => (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-10">
-        <h2 className="text-xl text-gray-300 mb-2">Select Your Location</h2>
+        <h2 className="text-xl text-gray-300 mb-2">Select Your Region</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
@@ -356,10 +357,9 @@ const BookingPage = () => {
               }}
               className={`
                 text-left p-6 rounded-xl border transition-all duration-300
-                ${
-                  isDisabled
-                    ? 'opacity-40 cursor-not-allowed bg-[#1A1A1A] border-white/10'
-                    : isSelected
+                ${isDisabled
+                  ? 'opacity-40 cursor-not-allowed bg-[#1A1A1A] border-white/10'
+                  : isSelected
                     ? 'bg-[#FAB614] border-[#FAB614] text-black'
                     : 'bg-[#1A1A1A] border-white/10 text-white hover:border-[#FAB614]/50'
                 }
@@ -368,9 +368,8 @@ const BookingPage = () => {
               <h3 className="text-lg font-bold mb-1">{loc.name}</h3>
 
               <p
-                className={`text-sm ${
-                  isSelected ? 'text-black/80' : 'text-gray-400'
-                }`}
+                className={`text-sm ${isSelected ? 'text-black/80' : 'text-gray-400'
+                  }`}
               >
                 {loc.count} courses available
               </p>
@@ -407,18 +406,25 @@ const BookingPage = () => {
             <div
               key={course.id}
               className={`bg-[#1A1A1A] border rounded-xl p-6 md:p-8 transition-all duration-300 shadow-lg
-                ${
-                  isFull
-                    ? 'border-red-500/30 opacity-80'
-                    : 'border-white/10 hover:border-[#FAB614]/30'
+                ${isFull
+                  ? 'border-red-500/30 opacity-80'
+                  : 'border-white/10 hover:border-[#FAB614]/30'
                 }
               `}
             >
               <div className="flex justify-between items-start mb-4">
+
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-1">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     {formatDate(course.date, 'step2')}
                   </h3>
+
+                  {course.city ? (
+                    <div className="inline-flex items-center gap-2 rounded-full border border-[#FAB614]/35 bg-gradient-to-r from-[#FAB614]/20 to-[#FAB614]/5 px-3.5 py-1.5 text-sm font-semibold text-[#FAB614] shadow-[0_0_18px_rgba(250,182,20,0.12)]">
+                      <MapPin size={15} className="text-[#FAB614]" />
+                      <span className="text-[#FAB614]">{course.city}</span>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="text-right">
@@ -445,9 +451,10 @@ const BookingPage = () => {
                 </div>
 
                 <div className="flex items-center gap-3 text-gray-300">
-                  <MapPin size={20} className="text-[#FAB614]" />
+                   <Building2 size={20} className="text-[#FAB614]" />
                   <span className="text-lg">{course.venue}</span>
                 </div>
+
 
                 <div className="flex items-center gap-3 text-gray-300">
                   <User size={20} className="text-[#FAB614]" />
@@ -486,10 +493,9 @@ const BookingPage = () => {
                 }}
                 className={`
                   w-full py-2 rounded-full text-lg font-semibold transition-all
-                  ${
-                    isFull
-                      ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                      : 'bg-[#FAB614] text-black hover:bg-[#E5970C] cursor-pointer shadow-[0_4px_14px_rgba(250,182,20,0.39)] hover:-translate-y-0.5'
+                  ${isFull
+                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : 'bg-[#FAB614] text-black hover:bg-[#E5970C] cursor-pointer shadow-[0_4px_14px_rgba(250,182,20,0.39)] hover:-translate-y-0.5'
                   }
                 `}
               >
@@ -527,7 +533,7 @@ const BookingPage = () => {
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <MapPin size={14} className="text-[#FAB614]" />
-                  {bookingData.course?.venue}, {bookingData.course?.location}
+                  {bookingData.course?.venue},{bookingData.course?.city} {(bookingData.course.city!=undefined && bookingData.course.city!='')?',':''} {bookingData.course?.location}
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <User size={14} className="text-[#FAB614]" />
@@ -791,10 +797,9 @@ const BookingPage = () => {
         {currentStep <= 5 && (
           <div className="flex items-center justify-between mb-8">
             <button
-              onClick={currentStep === 1 ? () => {} : handleBack}
-              className={`flex items-center gap-2 text-white hover:text-[#FAB614] transition-colors cursor-pointer ${
-                currentStep === 1 ? 'opacity-0 pointer-events-none' : ''
-              }`}
+              onClick={currentStep === 1 ? () => { } : handleBack}
+              className={`flex items-center gap-2 text-white hover:text-[#FAB614] transition-colors cursor-pointer ${currentStep === 1 ? 'opacity-0 pointer-events-none' : ''
+                }`}
             >
               <ChevronLeft size={20} />
               <span className="font-medium">Back</span>

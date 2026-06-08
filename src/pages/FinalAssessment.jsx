@@ -8,7 +8,8 @@ import {
     Armchair,
     BookOpen,
     Lock,
-    Loader2
+    Loader2,
+    Building2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -127,7 +128,7 @@ const FinalAssessment = () => {
         }
     }
 
-  
+
     async function payByFinal() {
 
 
@@ -366,7 +367,7 @@ const FinalAssessment = () => {
     const renderStep1 = () => (
         <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-                <h2 className="text-xl text-gray-300 mb-2">Select Your Location</h2>
+                <h2 className="text-xl text-gray-300 mb-2">Select Your Region</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
@@ -444,6 +445,13 @@ const FinalAssessment = () => {
                                     <h3 className="text-xl font-bold text-white mb-1">
                                         {moment(new Date(Number(course.date))).format("DD MMM, YYYY")}
                                     </h3>
+
+                                    {course.city ? (
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-[#FAB614]/35 bg-gradient-to-r from-[#FAB614]/20 to-[#FAB614]/5 px-3.5 py-1.5 text-sm font-semibold text-[#FAB614] shadow-[0_0_18px_rgba(250,182,20,0.12)]">
+                                            <MapPin size={15} className="text-[#FAB614]" />
+                                            <span className="text-[#FAB614]">{course.city}</span>
+                                        </div>
+                                    ) : null}
                                 </div>
                             </div>
 
@@ -463,7 +471,7 @@ const FinalAssessment = () => {
                                 </div>
 
                                 <div className="flex items-center gap-3 text-gray-300">
-                                    <MapPin size={20} className="text-[#FAB614]" />
+                                    <Building2 size={20} className="text-[#FAB614]" />
                                     <span className="text-lg">{course.venue}</span>
                                 </div>
 
@@ -548,7 +556,7 @@ const FinalAssessment = () => {
                                 </div>
                                 <div className="flex items-center gap-2 text-white">
                                     <MapPin size={14} className="text-[#FAB614]" />
-                                    {bookingData.course?.venue}, {bookingData.course?.location}
+                                    {bookingData.course?.venue},{bookingData.course?.city} {(bookingData.course.city != undefined && bookingData.course.city != '') ? ',' : ''} {bookingData.course?.location}
                                 </div>
                                 <div className="flex items-center gap-2 text-white">
                                     <User size={14} className="text-[#FAB614]" />
