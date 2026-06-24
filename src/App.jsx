@@ -1,58 +1,110 @@
+// ========================= Before return =========================
 
-import './App.css'
-import React, { useEffect, useState } from 'react'
-import { HomePage } from './pages/HomePage';
-import { HashRouter  as Router, Routes, Route } from 'react-router-dom';
-import ScrollToTop from './components/ScrollToTop';
-import AncillaryLearningPage from './pages/AncillaryLearningPage';
-import PatronsPage from './pages/PatronsPage';
-import NewsPage from './pages/NewsPage';
-import FAQsPage from './pages/FAQsPage';
-import TraineeDatabasePage from './pages/TraineesDatabasePage';
-import ProfilePage from './pages/ProfilePage';
-import BookingPage from './pages/BookingPage';
-import PrivacyPage from './pages/PrivacyPage';
-import TermsPage from './pages/TermsPage';
-import { auth } from './config';
-import ConfirmationPage from './pages/ConfirmationPage';
-import DonationPage from './pages/DonationPage';
-import FinalAssessment from './pages/FinalAssessment';
+import React, { Suspense, lazy } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import "./App.css";
+
+import Header from "./components/Layout/Header";
+import Footer from "./components/Layout/Footer";
+import ScrollToTop from "./components/Layout/ScrollToTop";
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ResultScreen = lazy(() => import("./pages/ResultScreen"));
+const ListingDetailsPage = lazy(() => import("./pages/ListingDetailsPage"));
+const FavouritesPage = lazy(() => import("./pages/FavouritesPage"));
+const NewsPage = lazy(() => import("./pages/NewsPage"));
+const EntertainmentDetailsPage = lazy(() =>
+  import("./pages/EntertainmentDetailsPage")
+);
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const SignUpPage = lazy(() => import("./pages/SignUpPage"));
+const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"));
+const QuotePage = lazy(() => import("./pages/QuotePage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsConditionsPage = lazy(() => import("./pages/TermsConditionsPage"));
+
+const AccountDashboardPage = lazy(() => import("./pages/AccountDashboardPage"));
+const AddEditListingPage = lazy(() => import("./pages/AddEditListingPage"));
+const QuotesPage = lazy(() => import("./pages/QuotesPage"));
+
+const PageLoader = () => {
+  return (
+    <div className="pageLoader">
+      <div className="loaderLogo">NWLB</div>
+      <div className="loaderLine" />
+      <p>Loading North West Local Business...</p>
+    </div>
+  );
+};
 
 function App() {
-
-  async function authing(){
-    await auth.signInWithEmailAndPassword('n.joy@boomsoftware.co.uk', '2103199j');
-  }
-
-  useEffect(() => {
-   authing()
-  }, [])
-
-
   return (
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/Confirmation' element={<ConfirmationPage/>}/>
-          <Route path='/ancillary-learning' element={<AncillaryLearningPage />} />
-          <Route path='/patrons' element={<PatronsPage />} />
-          <Route path='/donation' element={<DonationPage />} />
-          <Route path='/news' element={<NewsPage />} />
-          <Route path='/faq' element={<FAQsPage />} />
-          <Route path='/trainees' element={<TraineeDatabasePage />} />
-          <Route path='/profile' element={<ProfilePage />} />
-          <Route path='/booking' element={<BookingPage />} />
-          <Route path='/privacypolicy' element={<PrivacyPage />} />
-          <Route path='/termsandconditions' element={<TermsPage />} />
-          <Route path='/finalAssessment' element={<FinalAssessment />} />
+    // ========================= Inside return =========================
 
-           <Route path='*' element={<HomePage />} />
-        </Routes>
-      </Router>
-  )
+    <Router>
+      <ScrollToTop />
+
+      <div className="appRoot">
+        <Header />
+
+        <main className="appMain">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+
+              <Route path="/results" element={<ResultScreen />} />
+
+              <Route path="/listing/:id" element={<ListingDetailsPage />} />
+
+              <Route path="/favourites" element={<FavouritesPage />} />
+
+              <Route path="/news" element={<NewsPage />} />
+
+              <Route
+                path="/news/:id"
+                element={<EntertainmentDetailsPage />}
+              />
+
+              <Route path="/contact" element={<ContactPage />} />
+
+              <Route path="/login" element={<LoginPage />} />
+
+              <Route path="/signup" element={<SignUpPage />} />
+
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+              <Route path="/quote/:id" element={<QuotePage />} />
+
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+              <Route
+                path="/terms-conditions"
+                element={<TermsConditionsPage />}
+              />
+
+              <Route path="/account" element={<AccountDashboardPage />} />
+
+              <Route path="/add-listing" element={<AddEditListingPage mode="add" />} />
+
+              <Route path="/edit-listing/:id" element={<AddEditListingPage mode="edit" />} />
+
+              <Route path="/quotes" element={<QuotesPage />} />
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </main>
+
+        <Footer />
+      </div>
+    </Router>
+  );
 }
 
-export default App
-
-// 
+export default App;
