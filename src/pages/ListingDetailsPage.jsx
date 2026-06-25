@@ -23,8 +23,39 @@ import { useNavigate, useParams } from "react-router-dom";
 import AppDownloadStrip from "../components/common/AppDownloadStrip";
 import Stars from "../components/common/Stars";
 import { listingDetailsData, mockReviews } from "../data/mockData";
+import NiceModal from "../components/common/NiceModal";
 
 const ListingDetailsPage = () => {
+
+
+  const [niceModal, setNiceModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+    onPrimary: null,
+  });
+
+  const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+    setNiceModal({
+      open: true,
+      type,
+      title,
+      message,
+      onPrimary: onPrimary || null,
+    });
+  };
+
+  const closeNiceModal = () => {
+    setNiceModal({
+      open: false,
+      type: "info",
+      title: "",
+      message: "",
+      onPrimary: null,
+    });
+  };
+
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -84,17 +115,29 @@ const ListingDetailsPage = () => {
 
   const submitReview = () => {
     if (!reviewEmail.trim()) {
-      alert("Please enter your email.");
+      showNiceModal({
+        type: "warning",
+        title: "Email Required",
+        message: "Please enter your email.",
+      });
       return;
     }
 
     if (!reviewMessage.trim()) {
-      alert("Please write your review.");
+      showNiceModal({
+        type: "warning",
+        title: "Review Required",
+        message: "Please write your review.",
+      });
       return;
     }
 
     if (!selectedRating) {
-      alert("Please select rating.");
+      showNiceModal({
+        type: "warning",
+        title: "Rating Required",
+        message: "Please select a rating.",
+      });
       return;
     }
 
@@ -103,21 +146,34 @@ const ListingDetailsPage = () => {
       return;
     }
 
-    alert("Review submitted successfully. Firebase will be connected later.");
+    showNiceModal({
+      type: "success",
+      title: "Review Submitted",
+      message: "Review submitted successfully. Firebase will be connected later.",
+    });
+
     setReviewMessage("");
     setSelectedRating(0);
   };
 
   const verifyOtp = () => {
     if (otp.trim().length < 4) {
-      alert("Please enter verification code.");
+      showNiceModal({
+        type: "warning",
+        title: "Verification Code Required",
+        message: "Please enter verification code.",
+      });
       return;
     }
 
     setVerifiedEmail(reviewEmail.trim());
     setShowVerifyModal(false);
     setOtp("");
-    alert("Email verified. Now press submit again.");
+    showNiceModal({
+      type: "success",
+      title: "Email Verified",
+      message: "Email verified. Now press submit again.",
+    });
   };
 
   return (
@@ -343,6 +399,17 @@ const ListingDetailsPage = () => {
           </div>
         </div>
       )}
+
+      <NiceModal
+        open={niceModal.open}
+        type={niceModal.type}
+        title={niceModal.title}
+        message={niceModal.message}
+        primaryText="OK"
+        onClose={closeNiceModal}
+        onPrimary={niceModal.onPrimary || closeNiceModal}
+      />
+
     </div>
   );
 };

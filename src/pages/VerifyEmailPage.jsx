@@ -10,8 +10,40 @@ import {
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AppDownloadStrip from "../components/common/AppDownloadStrip";
+import NiceModal from "../components/common/NiceModal";
 
 const VerifyEmailPage = () => {
+
+
+  const [niceModal, setNiceModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+    onPrimary: null,
+  });
+
+  const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+    setNiceModal({
+      open: true,
+      type,
+      title,
+      message,
+      onPrimary: onPrimary || null,
+    });
+  };
+
+  const closeNiceModal = () => {
+    setNiceModal({
+      open: false,
+      type: "info",
+      title: "",
+      message: "",
+      onPrimary: null,
+    });
+  };
+
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -42,13 +74,23 @@ const VerifyEmailPage = () => {
     setTimeout(() => {
       setSending(false);
       setSentCode("1234");
-      alert("Verification code sent again. Mock code: 1234");
+
+      showNiceModal({
+        type: "info",
+        title: "Code Resent",
+        message: "A new verification code has been sent to your email.",
+      });
+
     }, 900);
   };
 
   const verifyCode = () => {
     if (!code.trim()) {
-      alert("Please enter verification code.");
+      showNiceModal({
+        type: "warning",
+        title: "Code Required",
+        message: "Please enter verification code.",
+      });
       return;
     }
 
@@ -61,14 +103,28 @@ const VerifyEmailPage = () => {
         setVerified(true);
 
         setTimeout(() => {
-          alert("Account verified. Firebase signup will be connected later.");
-          navigate("/login");
+
+          showNiceModal({
+            type: "success",
+            title: "Email Verified",
+            message: "Account verified. Firebase signup will be connected later.",
+            onPrimary: () => {
+              closeNiceModal();
+              navigate("/login");
+            },
+          });
+
         }, 1200);
 
         return;
       }
 
-      alert("Invalid verification code. For now use 1234.");
+      showNiceModal({
+        type: "error",
+        title: "Invalid Code",
+        message: "Invalid verification code. For now use 1234.",
+      });
+
     }, 900);
   };
 
@@ -154,6 +210,17 @@ const VerifyEmailPage = () => {
       </section>
 
       <AppDownloadStrip />
+
+      <NiceModal
+        open={niceModal.open}
+        type={niceModal.type}
+        title={niceModal.title}
+        message={niceModal.message}
+        primaryText="OK"
+        onClose={closeNiceModal}
+        onPrimary={niceModal.onPrimary || closeNiceModal}
+      />
+
     </div>
   );
 };

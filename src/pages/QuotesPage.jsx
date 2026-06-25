@@ -7,8 +7,38 @@ import AppDownloadStrip from "../components/common/AppDownloadStrip";
 import Stars from "../components/common/Stars";
 import { accountBusiness, mockQuoteRequests } from "../data/mockData";
 import ConfirmModal from "../components/common/ConfirmModal";
+import NiceModal from "../components/common/NiceModal";
 
 const QuotesPage = () => {
+
+    const [niceModal, setNiceModal] = useState({
+        open: false,
+        type: "info",
+        title: "",
+        message: "",
+        onPrimary: null,
+    });
+
+    const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+        setNiceModal({
+            open: true,
+            type,
+            title,
+            message,
+            onPrimary: onPrimary || null,
+        });
+    };
+
+    const closeNiceModal = () => {
+        setNiceModal({
+            open: false,
+            type: "info",
+            title: "",
+            message: "",
+            onPrimary: null,
+        });
+    };
+
 
     const [confirmModal, setConfirmModal] = useState({
         open: false,
@@ -30,7 +60,11 @@ const QuotesPage = () => {
             action: "",
         });
 
-        alert(`Quote ${actionText}. Firebase update will be connected later.`);
+        showNiceModal({
+            type: "success",
+            title: confirmModal.action === "accept" ? "Quote Accepted" : "Quote Declined",
+            message: `Quote ${actionText}. Firebase update will be connected later.`,
+        });
     };
 
     const location = useLocation();
@@ -196,6 +230,15 @@ const QuotesPage = () => {
                     })
                 }
                 onConfirm={handleQuoteAction}
+            />
+            <NiceModal
+                open={niceModal.open}
+                type={niceModal.type}
+                title={niceModal.title}
+                message={niceModal.message}
+                primaryText="OK"
+                onClose={closeNiceModal}
+                onPrimary={niceModal.onPrimary || closeNiceModal}
             />
         </div>
     );

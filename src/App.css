@@ -5191,3 +5191,340 @@ select:focus,
     height: 300px;
   }
 }
+
+/* ========================= Opening & Closing Final Premium Fix ========================= */
+
+.premiumOpeningEditor {
+  width: 100% !important;
+  max-width: 860px !important;
+  margin: 34px 0 38px !important;
+  display: grid !important;
+  gap: 16px !important;
+}
+
+.openingSectionHead {
+  margin-bottom: 4px;
+}
+
+.openingSectionHead h3 {
+  margin: 0 0 7px !important;
+  color: #001947 !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+}
+
+.openingSectionHead p {
+  margin: 0;
+  color: #6b7487;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.premiumOpeningRowV2 {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 145px 240px 1fr;
+  align-items: center;
+  gap: 18px;
+  background: linear-gradient(135deg, #ffffff, #f4f8fd);
+  border: 1px solid rgba(111, 155, 213, 0.26);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 12px 30px rgba(14, 45, 90, 0.08);
+}
+
+.openingDayName {
+  color: #001947;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.openingChoiceGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.openingChoice {
+  height: 42px;
+  border: 1px solid rgba(111, 155, 213, 0.38);
+  background: #ffffff;
+  color: #5b6678;
+  border-radius: 12px;
+  padding: 0 11px;
+  font-size: 13px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  transition: 0.2s ease;
+}
+
+.openingChoice:hover {
+  border-color: #2f5fae;
+  background: #f7fbff;
+}
+
+.openingChoice.activeOpen {
+  background: rgba(47, 95, 174, 0.1);
+  border-color: #2f5fae;
+  color: #2f5fae;
+}
+
+.openingChoice.activeClosed {
+  background: rgba(0, 25, 71, 0.08);
+  border-color: #001947;
+  color: #001947;
+}
+
+.fakeCheckBox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid rgba(111, 155, 213, 0.7);
+  background: #ffffff;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.activeOpen .fakeCheckBox {
+  background: #2f5fae;
+  border-color: #2f5fae;
+}
+
+.activeClosed .fakeCheckBox {
+  background: #001947;
+  border-color: #001947;
+}
+
+.openingTimeBoxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  transition: 0.2s ease;
+}
+
+.openingTimeBoxes.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.openingTimeBoxes label {
+  height: 46px;
+  border: 1px solid rgba(111, 155, 213, 0.38);
+  background: #ffffff;
+  border-radius: 13px;
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.openingTimeBoxes label span {
+  color: #6f9bd5;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.openingTimeBoxes input[type="time"] {
+  width: 100%;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  color: #001947 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  text-align: right;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.openingTimeBoxes input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/* Hide old broken opening styles if still rendered anywhere */
+.openingCheckLine,
+.openingTimeLine,
+.premiumOpeningRow,
+.premiumOpeningDay,
+.premiumTimeRow,
+.premiumToggleGroup {
+  all: unset;
+}
+
+/* Mobile */
+@media (max-width: 850px) {
+  .premiumOpeningRowV2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .openingChoiceGroup {
+    width: 100%;
+  }
+
+  .openingTimeBoxes {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================= Nice Modal / Alert Replacement ========================= */
+
+.niceModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 17, 54, 0.64);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  backdrop-filter: blur(8px);
+}
+
+.niceModalCard {
+  width: min(440px, 100%);
+  background: #ffffff;
+  border-radius: 26px;
+  padding: 34px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.28);
+  animation: niceModalPop 0.22s ease;
+  border: 1px solid rgba(111, 155, 213, 0.2);
+}
+
+.niceModalClose {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  border: none;
+  background: rgba(111, 155, 213, 0.13);
+  color: #2f5fae;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.niceModalIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.niceModalIcon.info {
+  color: #2f5fae;
+  background: rgba(111, 155, 213, 0.16);
+}
+
+.niceModalIcon.success {
+  color: #16894b;
+  background: rgba(34, 164, 93, 0.14);
+}
+
+.niceModalIcon.warning {
+  color: #c49600;
+  background: rgba(246, 206, 55, 0.18);
+}
+
+.niceModalIcon.error {
+  color: #d12b2b;
+  background: rgba(209, 43, 43, 0.12);
+}
+
+.niceModalCard h2 {
+  margin: 0 0 10px;
+  color: #001947;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 900;
+}
+
+.niceModalCard p {
+  margin: 0;
+  color: #5b6678;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.niceModalActions {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.niceModalActions.twoActions {
+  grid-template-columns: 1fr 1fr;
+}
+
+.niceModalPrimary,
+.niceModalSecondary {
+  height: 50px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.niceModalPrimary {
+  border: none;
+  background: #2f5fae;
+  color: #ffffff;
+}
+
+.niceModalSecondary {
+  border: 1px solid #2f5fae;
+  background: #ffffff;
+  color: #2f5fae;
+}
+
+.niceModalPrimary:disabled,
+.niceModalSecondary:disabled {
+  opacity: 0.65;
+}
+
+@keyframes niceModalPop {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 520px) {
+  .niceModalCard {
+    padding: 28px 22px;
+  }
+
+  .niceModalActions.twoActions {
+    grid-template-columns: 1fr;
+  }
+}

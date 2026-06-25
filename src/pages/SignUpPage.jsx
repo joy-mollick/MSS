@@ -13,9 +13,38 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AppDownloadStrip from "../components/common/AppDownloadStrip";
+import NiceModal from "../components/common/NiceModal";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+
+  const [niceModal, setNiceModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+    onPrimary: null,
+  });
+
+  const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+    setNiceModal({
+      open: true,
+      type,
+      title,
+      message,
+      onPrimary: onPrimary || null,
+    });
+  };
+
+  const closeNiceModal = () => {
+    setNiceModal({
+      open: false,
+      type: "info",
+      title: "",
+      message: "",
+      onPrimary: null,
+    });
+  };
 
   const [form, setForm] = useState({
     fullName: "",
@@ -66,7 +95,11 @@ const SignUpPage = () => {
 
   const handleSignUp = () => {
     if (!form.fullName.trim() || !form.email.trim() || !form.password.trim()) {
-      alert("Please fill name, email and password.");
+      showNiceModal({
+        type: "warning",
+        title: "Missing Details",
+        message: "Please fill name, email and password.",
+      });
       return;
     }
 
@@ -190,6 +223,15 @@ const SignUpPage = () => {
       </section>
 
       <AppDownloadStrip />
+      <NiceModal
+        open={niceModal.open}
+        type={niceModal.type}
+        title={niceModal.title}
+        message={niceModal.message}
+        primaryText="OK"
+        onClose={closeNiceModal}
+        onPrimary={niceModal.onPrimary || closeNiceModal}
+      />
     </div>
   );
 };

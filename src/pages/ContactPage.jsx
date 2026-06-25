@@ -10,8 +10,40 @@ import {
   User,
 } from "lucide-react";
 import AppDownloadStrip from "../components/common/AppDownloadStrip";
+import NiceModal from "../components/common/NiceModal";
+
 
 const ContactPage = () => {
+
+
+  const [niceModal, setNiceModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+    onPrimary: null,
+  });
+
+  const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+    setNiceModal({
+      open: true,
+      type,
+      title,
+      message,
+      onPrimary: onPrimary || null,
+    });
+  };
+
+  const closeNiceModal = () => {
+    setNiceModal({
+      open: false,
+      type: "info",
+      title: "",
+      message: "",
+      onPrimary: null,
+    });
+  };
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -30,7 +62,11 @@ const ContactPage = () => {
 
   const submitContact = () => {
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      alert("Please fill name, email and message.");
+      showNiceModal({
+        type: "warning",
+        title: "Missing Details",
+        message: "Please fill name, email and message.",
+      });
       return;
     }
 
@@ -169,6 +205,18 @@ const ContactPage = () => {
           </div>
         </div>
       )}
+
+
+      <NiceModal
+        open={niceModal.open}
+        type={niceModal.type}
+        title={niceModal.title}
+        message={niceModal.message}
+        primaryText="OK"
+        onClose={closeNiceModal}
+        onPrimary={niceModal.onPrimary || closeNiceModal}
+      />
+
     </div>
   );
 };

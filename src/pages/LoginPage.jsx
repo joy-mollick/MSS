@@ -4,9 +4,40 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, MapPin, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AppDownloadStrip from "../components/common/AppDownloadStrip";
+import NiceModal from "../components/common/NiceModal";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
+
+  const [niceModal, setNiceModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+    onPrimary: null,
+  });
+
+  const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+    setNiceModal({
+      open: true,
+      type,
+      title,
+      message,
+      onPrimary: onPrimary || null,
+    });
+  };
+
+  const closeNiceModal = () => {
+    setNiceModal({
+      open: false,
+      type: "info",
+      title: "",
+      message: "",
+      onPrimary: null,
+    });
+  };
+
 
   const [form, setForm] = useState({
     email: "",
@@ -54,7 +85,11 @@ const LoginPage = () => {
 
   const handleLogin = () => {
     if (!form.email.trim() || !form.password.trim()) {
-      alert("Please enter email and password.");
+      showNiceModal({
+        type: "warning",
+        title: "Missing Details",
+        message: "Please enter email and password.",
+      });
       return;
     }
 
@@ -64,7 +99,11 @@ const LoginPage = () => {
     window.dispatchEvent(new Event("nwlb_auth_change"));
 
     setTimeout(() => {
-      alert("Login flow will be connected to Firebase later.");
+      showNiceModal({
+        type: "info",
+        title: "Login Successful",
+        message: "You have been logged in successfully.",
+      });
       navigate("/account");
     }, 500);
   };
@@ -155,6 +194,15 @@ const LoginPage = () => {
       </section>
 
       <AppDownloadStrip />
+      <NiceModal
+        open={niceModal.open}
+        type={niceModal.type}
+        title={niceModal.title}
+        message={niceModal.message}
+        primaryText="OK"
+        onClose={closeNiceModal}
+        onPrimary={niceModal.onPrimary || closeNiceModal}
+      />
     </div>
   );
 };

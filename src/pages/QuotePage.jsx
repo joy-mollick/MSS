@@ -5,8 +5,39 @@ import { ArrowLeft, CalendarDays, CheckCircle2, MapPin, Send } from "lucide-reac
 import { useNavigate, useParams } from "react-router-dom";
 import AppDownloadStrip from "../components/common/AppDownloadStrip";
 import { listingDetailsData } from "../data/mockData";
+import NiceModal from "../components/common/NiceModal";
 
 const QuotePage = () => {
+
+
+  const [niceModal, setNiceModal] = useState({
+    open: false,
+    type: "info",
+    title: "",
+    message: "",
+    onPrimary: null,
+  });
+
+  const showNiceModal = ({ type = "info", title, message, onPrimary }) => {
+    setNiceModal({
+      open: true,
+      type,
+      title,
+      message,
+      onPrimary: onPrimary || null,
+    });
+  };
+
+  const closeNiceModal = () => {
+    setNiceModal({
+      open: false,
+      type: "info",
+      title: "",
+      message: "",
+      onPrimary: null,
+    });
+  };
+
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -32,7 +63,13 @@ const QuotePage = () => {
 
   const submitQuote = () => {
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
-      alert("Please fill name, email and phone number.");
+
+      showNiceModal({
+        type: "warning",
+        title: "Missing Details",
+        message: "Please fill name, email and phone number.",
+      });
+
       return;
     }
 
@@ -152,6 +189,17 @@ const QuotePage = () => {
           </div>
         </div>
       )}
+
+      <NiceModal
+        open={niceModal.open}
+        type={niceModal.type}
+        title={niceModal.title}
+        message={niceModal.message}
+        primaryText="OK"
+        onClose={closeNiceModal}
+        onPrimary={niceModal.onPrimary || closeNiceModal}
+      />
+
     </div>
   );
 };
