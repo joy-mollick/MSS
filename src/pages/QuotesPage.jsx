@@ -50,7 +50,7 @@ const QuotesPage = () => {
             open: true,
             action,
         });
-    };
+    }
 
     const handleQuoteAction = () => {
         const actionText = confirmModal.action === "accept" ? "accepted" : "declined";
