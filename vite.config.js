@@ -11,7 +11,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: '/',
+  base: "/NWLB-WebSite/",
   server: {
     host: true,
     allowedHosts: ['ed87-91-196-223-220.ngrok-free.app'],
